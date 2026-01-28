@@ -40,6 +40,7 @@ import toolSelectImg from 'url:/src/app/img/ui/tool-select.svg';
 import tabSettingsImg from 'url:/src/app/img/ui/tab-settings.svg';
 import tabLayersImg from 'url:/src/app/img/ui/tab-layers.svg';
 import tabEditImg from 'url:/src/app/img/ui/tab-edit.svg';
+import tabLearnImg from 'url:/src/app/img/ui/tab-learn.svg';
 import { LayersUi } from '../klecks/ui/tool-tabs/layers-ui/layers-ui';
 import { TVector2D } from '../bb/bb-types';
 import { createConsoleApi } from './console-api';
@@ -1856,6 +1857,16 @@ export class KlApp {
             customAbout: p.aboutEl,
         });
 
+        // Learn tab UI (curriculum/learning system)
+        const learnUi = !this.embed
+            ? new KL.LearnUi({
+                  onStartExercise: (exercise) => {
+                      // TODO: Implement exercise mode in Phase 2
+                      console.log('Starting exercise:', exercise.id, exercise.title);
+                  },
+              })
+            : undefined;
+
         mainTabRow = new KL.TabRow({
             initialId: 'brush',
             tabArr: [
@@ -2027,6 +2038,27 @@ export class KlApp {
                     },
                 },
                 {
+                    id: 'learn',
+                    title: LANG('tab-learn'),
+                    image: tabLearnImg,
+                    isVisible: !!learnUi,
+                    onOpen: () => {
+                        if (learnUi) {
+                            learnUi.getElement().style.display = 'block';
+                            learnUi.setIsVisible(true);
+                        }
+                    },
+                    onClose: () => {
+                        if (learnUi) {
+                            learnUi.getElement().style.display = 'none';
+                            learnUi.setIsVisible(false);
+                        }
+                    },
+                    css: {
+                        minWidth: '45px',
+                    },
+                },
+                {
                     id: 'settings',
                     title: LANG('tab-settings'),
                     image: tabSettingsImg,
@@ -2077,6 +2109,7 @@ export class KlApp {
             this.layersUi.getElement(),
             editUi.getElement(),
             fileUi ? fileUi.getElement() : undefined,
+            learnUi ? learnUi.getElement() : undefined,
             settingsUi.getElement(),
             BB.el({
                 css: {

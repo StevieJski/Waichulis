@@ -1077,4 +1077,37 @@ Renaming a key across multiple language files:
   "wip": 'Work in progress',
   "browser-zoom-help": "Double-tap or pinch-out to reset browser zoom.",
   "dismiss": "Dismiss",
+
+  // Learn tab (Visual Language curriculum)
+  "tab-learn": {
+    hint: "Tab for learning exercises and curriculum",
+    value: "Learn"
+  },
+  "learn-grade-level": {
+    hint: "Label for grade level selector",
+    value: "Grade Level"
+  },
+  "learn-grade-kindergarten": "Kindergarten",
+  "learn-unit-line": "Lines",
+  "learn-unit-shape": "Shapes",
+  "learn-unit-color": "Colors",
+  "learn-overall-progress": "Overall Progress",
+  "learn-continue": "Continue Learning",
+  "learn-start": "Start Learning",
+  "learn-complete": "Complete",
+  "learn-new": "New",
+  "learn-settings": "Learning Settings",
+  "learn-api-provider": "AI Feedback",
+  "learn-api-none": "None (Offline)",
+  "learn-test-connection": "Test Connection",
+  "learn-clear-progress": "Clear Progress",
+  "learn-clear-progress-confirm": "Are you sure you want to clear all progress? This cannot be undone.",
+  "learn-exercise-instructions": "Instructions",
+  "learn-exercise-submit": "Submit",
+  "learn-exercise-try-again": "Try Again",
+  "learn-exercise-next": "Next Exercise",
+  "learn-exercise-score": "Score",
+  "learn-exercise-passed": "Passed!",
+  "learn-exercise-keep-practicing": "Keep practicing!",
+  "learn-get-help": "Get Help",
 }

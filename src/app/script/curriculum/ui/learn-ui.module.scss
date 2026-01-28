@@ -1,0 +1,302 @@
+/**
+ * Learn Tab UI Styles
+ */
+
+.learnRoot {
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+// Grade selector section
+.gradeSection {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.gradeLabel {
+    font-weight: bold;
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+// Unit tabs
+.unitTabs {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid var(--kl-color-ui-border);
+    padding-bottom: 5px;
+}
+
+.unitTab {
+    padding: 6px 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 4px 4px 0 0;
+    font-size: 12px;
+    opacity: 0.7;
+    transition: opacity 0.2s, background 0.2s;
+
+    &:hover {
+        opacity: 1;
+        background: var(--kl-color-bg-hover);
+    }
+
+    &.active {
+        opacity: 1;
+        background: var(--kl-color-bg-active);
+        font-weight: bold;
+    }
+}
+
+// Lesson cards
+.lessonList {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.lessonCard {
+    border: 1px solid var(--kl-color-ui-border);
+    border-radius: 6px;
+    padding: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+
+    &:hover {
+        border-color: var(--kl-color-primary);
+        background: var(--kl-color-bg-hover);
+    }
+
+    &.completed {
+        border-color: var(--kl-color-success, #4caf50);
+    }
+}
+
+.lessonTitle {
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.lessonDescription {
+    font-size: 11px;
+    opacity: 0.8;
+    margin-bottom: 6px;
+}
+
+.lessonProgress {
+    height: 4px;
+    background: var(--kl-color-ui-border);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.lessonProgressFill {
+    height: 100%;
+    background: var(--kl-color-primary);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+// Exercise list
+.exerciseList {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+    padding-left: 10px;
+}
+
+.exerciseItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.2s;
+
+    &:hover {
+        background: var(--kl-color-bg-hover);
+    }
+
+    &.passed {
+        opacity: 0.8;
+    }
+}
+
+.exerciseIcon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--kl-color-ui-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    flex-shrink: 0;
+
+    &.passed {
+        background: var(--kl-color-success, #4caf50);
+        border-color: var(--kl-color-success, #4caf50);
+        color: white;
+    }
+}
+
+.exerciseTitle {
+    flex: 1;
+}
+
+.exerciseDifficulty {
+    font-size: 10px;
+    opacity: 0.6;
+}
+
+// Overall progress
+.overallProgress {
+    margin-top: 10px;
+    padding: 10px;
+    background: var(--kl-color-bg-active);
+    border-radius: 6px;
+}
+
+.overallProgressLabel {
+    font-size: 11px;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.overallProgressBar {
+    height: 8px;
+    background: var(--kl-color-ui-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.overallProgressFill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--kl-color-primary), var(--kl-color-success, #4caf50));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+// Action buttons
+.actionButtons {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.continueButton {
+    flex: 1;
+    padding: 10px;
+    background: var(--kl-color-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: opacity 0.2s;
+
+    &:hover {
+        opacity: 0.9;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+.settingsButton {
+    padding: 10px;
+    background: transparent;
+    border: 1px solid var(--kl-color-ui-border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover {
+        background: var(--kl-color-bg-hover);
+    }
+}
+
+// Empty state
+.emptyState {
+    text-align: center;
+    padding: 20px;
+    opacity: 0.7;
+}
+
+// Settings panel
+.settingsPanel {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid var(--kl-color-ui-border);
+    border-radius: 6px;
+}
+
+.settingsRow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.settingsLabel {
+    font-size: 12px;
+    min-width: 80px;
+}
+
+.settingsInput {
+    flex: 1;
+    padding: 6px 8px;
+    border: 1px solid var(--kl-color-ui-border);
+    border-radius: 4px;
+    font-size: 12px;
+    background: var(--kl-color-bg);
+    color: inherit;
+}
+
+// Badge
+.badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+.badgeComplete {
+    background: var(--kl-color-success, #4caf50);
+    color: white;
+}
+
+.badgeNew {
+    background: var(--kl-color-primary);
+    color: white;
+}
+
+// Dark theme adjustments
+:global(.kl-theme-dark) {
+    .lessonCard {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .overallProgress {
+        background: rgba(255, 255, 255, 0.05);
+    }
+}

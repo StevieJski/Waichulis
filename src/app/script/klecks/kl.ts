@@ -61,6 +61,7 @@ import { SettingsUi } from './ui/tool-tabs/settings-ui';
 import { ToolspaceScroller } from './ui/components/toolspace-scroller';
 import { GradientUi } from './ui/tool-tabs/gradient-ui';
 import { drawGradient, GradientTool } from './image-operations/gradient-tool';
+import { LearnUi } from '../curriculum/ui/learn-ui';
 
 /**
  * paint tool functionality
@@ -149,6 +150,7 @@ export const KL = {
     EditUi,
     SettingsUi,
     LayersUi,
+    LearnUi,
 };
 
 Object.keys(KL); // without this, parcel build may break this object
