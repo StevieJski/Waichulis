@@ -86,6 +86,7 @@ import { ExerciseOverlay } from '../curriculum/tools/exercise-overlay';
 import { ExercisePanel } from '../curriculum/ui/exercise-panel';
 import { showAssessmentModal } from '../curriculum/ui/assessment-modal';
 import { assessmentOrchestrator } from '../curriculum/assessment/assessment-orchestrator';
+import { progressStore } from '../curriculum/storage/progress-store';
 import { TExercise, TStrokeData } from '../curriculum/types';
 
 importFilters();
@@ -1962,6 +1963,14 @@ export class KlApp {
                             exerciseStrokeData,
                             undefined, // canvasSnapshot - could capture for color exercises
                             'kindergarten'
+                        );
+
+                        // Record progress
+                        await progressStore.recordExerciseAttempt(
+                            exercise.id,
+                            exercise.lessonId,
+                            exercise.unit,
+                            assessment
                         );
 
                         // Show assessment modal
