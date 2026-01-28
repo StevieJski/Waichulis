@@ -1936,10 +1936,33 @@ export class KlApp {
 
         // Helper to clear just the user's drawing (not background)
         const clearUserDrawing = () => {
-            // Clear the current drawing layer (top layer where user draws)
+            console.log('=== clearUserDrawing ===');
+            console.log('currentLayer.index:', currentLayer.index);
+            console.log('layer count:', this.klCanvas.getLayerCount());
+            console.log('canvas size:', currentLayer.canvas.width, 'x', currentLayer.canvas.height);
+
+            // Try multiple approaches to clear
+
+            // Approach 1: Direct context clear
             const ctx = currentLayer.context;
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
             ctx.clearRect(0, 0, currentLayer.canvas.width, currentLayer.canvas.height);
+            ctx.restore();
+            console.log('Direct clearRect done');
+
+            // Approach 2: klCanvas eraseLayer
+            this.klCanvas.eraseLayer({
+                layerIndex: currentLayer.index,
+                useAlphaLock: false,
+                useSelection: false,
+            });
+            console.log('eraseLayer done');
+
+            // Force render update
             this.easelProjectUpdater.update();
+            this.easel.requestRender();
+            console.log('render update done');
 
             // Reset stroke data
             exerciseStrokeData = { strokes: [], startTime: 0, endTime: 0 };
