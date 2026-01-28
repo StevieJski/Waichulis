@@ -1934,24 +1934,24 @@ export class KlApp {
             currentExerciseStroke = [];
         };
 
-        const startExerciseMode = (exercise: TExercise) => {
-            // End any existing exercise
-            endExerciseMode();
-
-            // Clear all layers for fresh start
-            const layerCount = this.klCanvas.getLayerCount();
-            for (let i = 0; i < layerCount; i++) {
-                this.klCanvas.eraseLayer({
-                    layerIndex: i,
-                    useAlphaLock: false,
-                    useSelection: false,
-                });
-            }
+        // Helper to clear just the user's drawing (not background)
+        const clearUserDrawing = () => {
+            // Clear the current drawing layer (top layer where user draws)
+            const ctx = currentLayer.context;
+            ctx.clearRect(0, 0, currentLayer.canvas.width, currentLayer.canvas.height);
             this.easelProjectUpdater.update();
 
             // Reset stroke data
             exerciseStrokeData = { strokes: [], startTime: 0, endTime: 0 };
             currentExerciseStroke = [];
+        };
+
+        const startExerciseMode = (exercise: TExercise) => {
+            // End any existing exercise
+            endExerciseMode();
+
+            // Clear user's drawing layer (keep background intact)
+            clearUserDrawing();
 
             currentExercise = exercise;
 
@@ -2008,8 +2008,11 @@ export class KlApp {
                         });
 
                         if (result === 'tryAgain') {
-                            // Restart the same exercise (this clears canvas properly)
-                            startExerciseMode(exercise);
+                            // Clear drawing and reset for retry (keep overlay intact)
+                            clearUserDrawing();
+                            if (exercisePanel) {
+                                exercisePanel.setHasDrawn(false);
+                            }
                         } else {
                             // 'next' or 'closed' - end exercise mode
                             endExerciseMode();
@@ -2029,12 +2032,8 @@ export class KlApp {
                     mainTabRow?.open('learn');
                 },
                 onClear: () => {
-                    // Use the existing clearLayer function
-                    clearLayer(false, true);
-                    this.easelProjectUpdater.update();
-                    // Reset stroke data
-                    exerciseStrokeData = { strokes: [], startTime: 0, endTime: 0 };
-                    currentExerciseStroke = [];
+                    // Clear user's drawing (keep background and overlay)
+                    clearUserDrawing();
                     if (exercisePanel) {
                         exercisePanel.setHasDrawn(false);
                     }
