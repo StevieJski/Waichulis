@@ -23,5 +23,11 @@ export { shapeAnalyzer, ShapeAnalyzer } from './assessment/shape-analyzer';
 export { colorAnalyzer, ColorAnalyzer } from './assessment/color-analyzer';
 export { assessmentOrchestrator, AssessmentOrchestrator } from './assessment/assessment-orchestrator';
 
+// Tools
+export { ExerciseOverlay } from './tools/exercise-overlay';
+export { EaselExercise } from './tools/easel-exercise';
+
 // UI
 export { LearnUi } from './ui/learn-ui';
+export { ExercisePanel } from './ui/exercise-panel';
+export { AssessmentModal, showAssessmentModal } from './ui/assessment-modal';
