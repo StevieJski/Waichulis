@@ -82,6 +82,9 @@ import { requestPersistentStorage } from '../klecks/storage/request-persistent-s
 import { CrossTabChannel } from '../bb/base/cross-tab-channel';
 import { MobileColorUi } from '../klecks/ui/mobile/mobile-color-ui';
 import { getSelectionPath2d } from '../bb/multi-polygon/get-selection-path-2d';
+import { ExerciseOverlay } from '../curriculum/tools/exercise-overlay';
+import { ExercisePanel } from '../curriculum/ui/exercise-panel';
+import { TExercise } from '../curriculum/types';
 
 importFilters();
 
@@ -414,12 +417,19 @@ export class KlApp {
             chainArr: [this.lineSanitizer as any, lineSmoothing as any],
         });
 
+        // Track if drawing occurred during exercise mode
+        let exerciseDrawCallback: (() => void) | null = null;
+
         drawEventChain.setChainOut(((event: TDrawEvent) => {
             if (event.type === 'down') {
                 this.toolspace.style.pointerEvents = 'none';
                 currentBrushUi.startLine(event.x, event.y, event.pressure);
                 this.easelBrush.setLastDrawEvent({ x: event.x, y: event.y });
                 this.easel.requestRender();
+                // Notify exercise panel that drawing started
+                if (exerciseDrawCallback) {
+                    exerciseDrawCallback();
+                }
             }
             if (event.type === 'move') {
                 currentBrushUi.goLine(event.x, event.y, event.pressure, event.isCoalesced);
@@ -1858,11 +1868,103 @@ export class KlApp {
         });
 
         // Learn tab UI (curriculum/learning system)
+        let currentExercise: TExercise | null = null;
+        let exerciseOverlay: ExerciseOverlay | null = null;
+        let exercisePanel: ExercisePanel | null = null;
+
+        const endExerciseMode = () => {
+            if (exerciseOverlay) {
+                exerciseOverlay.destroy();
+                exerciseOverlay = null;
+            }
+            if (exercisePanel) {
+                exercisePanel.destroy();
+                exercisePanel = null;
+            }
+            currentExercise = null;
+            exerciseDrawCallback = null;
+        };
+
+        const startExerciseMode = (exercise: TExercise) => {
+            // End any existing exercise
+            endExerciseMode();
+
+            currentExercise = exercise;
+
+            // Get the easel element to attach overlay
+            const easelEl = this.easel.getElement();
+
+            // Create overlay with exercise dimensions (or canvas dimensions)
+            const canvasWidth = exercise.config.canvasWidth || 800;
+            const canvasHeight = exercise.config.canvasHeight || 600;
+            exerciseOverlay = new ExerciseOverlay(canvasWidth, canvasHeight);
+            exerciseOverlay.setExercise(exercise);
+
+            // Position overlay over the easel
+            const overlayEl = exerciseOverlay.getElement();
+            css(overlayEl, {
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                pointerEvents: 'none', // Allow drawing through the overlay
+                zIndex: '50',
+            });
+            easelEl.style.position = 'relative';
+            easelEl.appendChild(overlayEl);
+
+            // Create exercise panel
+            exercisePanel = new ExercisePanel({
+                onSubmit: async () => {
+                    // For now, show a simple completion message
+                    alert(`Exercise "${exercise.title}" submitted!\n\nIn the full version, this would assess your drawing and provide AI feedback.`);
+                    endExerciseMode();
+                    if (learnUi) {
+                        learnUi.onExerciseCompleted();
+                    }
+                    // Switch back to Learn tab
+                    mainTabRow?.open('learn');
+                },
+                onCancel: () => {
+                    endExerciseMode();
+                    // Switch back to Learn tab
+                    mainTabRow?.open('learn');
+                },
+                onClear: () => {
+                    // Use the existing clearLayer function
+                    clearLayer(false, true);
+                    if (exercisePanel) {
+                        exercisePanel.setHasDrawn(false);
+                    }
+                },
+                onGetHelp: () => {
+                    alert(`Help for "${exercise.title}":\n\n${exercise.instructions}\n\nTip: Take your time and follow the guide overlay.`);
+                },
+            });
+            exercisePanel.setExercise(exercise);
+            exercisePanel.setVisible(true);
+            exercisePanel.setHasDrawn(false);
+
+            // Append panel to easel
+            easelEl.appendChild(exercisePanel.getElement());
+
+            // Switch to brush tool
+            this.easel.setTool('brush');
+            mainTabRow.open('brush');
+
+            // Set up draw callback to track when user draws
+            exerciseDrawCallback = () => {
+                if (exercisePanel) {
+                    exercisePanel.setHasDrawn(true);
+                }
+            };
+
+            console.log('Exercise mode started:', exercise.title);
+        };
+
         const learnUi = !this.embed
             ? new KL.LearnUi({
                   onStartExercise: (exercise) => {
-                      // TODO: Implement exercise mode in Phase 2
-                      console.log('Starting exercise:', exercise.id, exercise.title);
+                      startExerciseMode(exercise);
                   },
               })
             : undefined;

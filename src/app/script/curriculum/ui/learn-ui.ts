@@ -219,10 +219,17 @@ export class LearnUi {
             className: `${classes.lessonCard} ${isComplete ? classes.completed : ''}`,
         });
 
-        // Title with badge
+        // Title with expand indicator and badge
         const titleRow = BB.el({
             className: classes.lessonTitle,
         });
+
+        // Expand/collapse chevron
+        const chevron = BB.el({
+            className: classes.lessonChevron,
+            content: isExpanded ? '\u25BC' : '\u25B6', // ▼ or ▶
+        });
+        titleRow.append(chevron);
 
         titleRow.append(document.createTextNode(lesson.title));
 
@@ -241,6 +248,15 @@ export class LearnUi {
         }
 
         card.append(titleRow);
+
+        // Hint text when collapsed
+        if (!isExpanded) {
+            const hint = BB.el({
+                className: classes.lessonHint,
+                content: `${lesson.exercises.length} exercises - click to expand`,
+            });
+            card.append(hint);
+        }
 
         // Description
         const description = BB.el({
@@ -297,7 +313,7 @@ export class LearnUi {
             // Icon
             const icon = BB.el({
                 className: `${classes.exerciseIcon} ${isPassed ? classes.passed : ''}`,
-                content: isPassed ? '\u2713' : '',
+                content: isPassed ? '\u2713' : '\u25B6', // ▶ play icon if not passed
             });
             item.append(icon);
 
@@ -315,7 +331,19 @@ export class LearnUi {
             });
             item.append(difficulty);
 
-            // Click to start exercise
+            // Start button
+            const startBtn = BB.el({
+                tagName: 'button',
+                className: classes.exerciseStartBtn,
+                content: isPassed ? 'Retry' : 'Start',
+                onClick: (e: MouseEvent) => {
+                    e.stopPropagation();
+                    this.startExercise(exercise);
+                },
+            });
+            item.append(startBtn);
+
+            // Click anywhere on row to start exercise
             item.onclick = (e) => {
                 e.stopPropagation();
                 this.startExercise(exercise);

@@ -85,6 +85,19 @@
     gap: 6px;
 }
 
+.lessonChevron {
+    font-size: 10px;
+    opacity: 0.6;
+    transition: transform 0.2s;
+}
+
+.lessonHint {
+    font-size: 10px;
+    opacity: 0.5;
+    font-style: italic;
+    margin-bottom: 6px;
+}
+
 .lessonDescription {
     font-size: 11px;
     opacity: 0.8;
@@ -158,6 +171,23 @@
 .exerciseDifficulty {
     font-size: 10px;
     opacity: 0.6;
+}
+
+.exerciseStartBtn {
+    padding: 4px 10px;
+    font-size: 11px;
+    border: 1px solid var(--kl-color-primary);
+    background: transparent;
+    color: var(--kl-color-primary);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    flex-shrink: 0;
+
+    &:hover {
+        background: var(--kl-color-primary);
+        color: white;
+    }
 }
 
 // Overall progress
