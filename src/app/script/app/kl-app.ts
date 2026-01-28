@@ -1938,8 +1938,15 @@ export class KlApp {
             // End any existing exercise
             endExerciseMode();
 
-            // Clear canvas for fresh start
-            clearLayer(false, true);
+            // Clear all layers for fresh start
+            const layerCount = this.klCanvas.getLayerCount();
+            for (let i = 0; i < layerCount; i++) {
+                this.klCanvas.eraseLayer({
+                    layerIndex: i,
+                    useAlphaLock: false,
+                    useSelection: false,
+                });
+            }
             this.easelProjectUpdater.update();
 
             // Reset stroke data
