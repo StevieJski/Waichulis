@@ -1940,6 +1940,7 @@ export class KlApp {
 
             // Clear canvas for fresh start
             clearLayer(false, true);
+            this.easelProjectUpdater.update();
 
             // Reset stroke data
             exerciseStrokeData = { strokes: [], startTime: 0, endTime: 0 };
@@ -2004,6 +2005,7 @@ export class KlApp {
                             exerciseStrokeData = { strokes: [], startTime: 0, endTime: 0 };
                             currentExerciseStroke = [];
                             clearLayer(false, true);
+                            this.easelProjectUpdater.update();
                             if (exercisePanel) {
                                 exercisePanel.setHasDrawn(false);
                             }
@@ -2028,6 +2030,7 @@ export class KlApp {
                 onClear: () => {
                     // Use the existing clearLayer function
                     clearLayer(false, true);
+                    this.easelProjectUpdater.update();
                     // Reset stroke data
                     exerciseStrokeData = { strokes: [], startTime: 0, endTime: 0 };
                     currentExerciseStroke = [];
