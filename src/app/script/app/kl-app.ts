@@ -2001,14 +2001,8 @@ export class KlApp {
                         });
 
                         if (result === 'tryAgain') {
-                            // Reset stroke data and clear canvas for retry
-                            exerciseStrokeData = { strokes: [], startTime: 0, endTime: 0 };
-                            currentExerciseStroke = [];
-                            clearLayer(false, true);
-                            this.easelProjectUpdater.update();
-                            if (exercisePanel) {
-                                exercisePanel.setHasDrawn(false);
-                            }
+                            // Restart the same exercise (this clears canvas properly)
+                            startExerciseMode(exercise);
                         } else {
                             // 'next' or 'closed' - end exercise mode
                             endExerciseMode();
