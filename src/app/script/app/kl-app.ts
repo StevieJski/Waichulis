@@ -1938,6 +1938,13 @@ export class KlApp {
             // End any existing exercise
             endExerciseMode();
 
+            // Clear canvas for fresh start
+            clearLayer(false, true);
+
+            // Reset stroke data
+            exerciseStrokeData = { strokes: [], startTime: 0, endTime: 0 };
+            currentExerciseStroke = [];
+
             currentExercise = exercise;
 
             // Get the easel element to attach overlay
