@@ -423,6 +423,9 @@ export class KlApp {
         // Track if drawing occurred during exercise mode
         let exerciseDrawCallback: (() => void) | null = null;
 
+        // Callback to update exercise overlay transform when viewport changes
+        let exerciseOverlayTransformCallback: ((transform: { x: number; y: number; scale: number; angleDeg: number }) => void) | null = null;
+
         // Stroke data tracking for exercise assessment
         let exerciseStrokeData: TStrokeData = { strokes: [], startTime: 0, endTime: 0 };
         let currentExerciseStroke: { x: number; y: number; pressure: number; timestamp: number }[] = [];
@@ -804,6 +807,11 @@ export class KlApp {
                 }
                 if (isFirstTransform) {
                     isFirstTransform = false;
+                }
+
+                // Update exercise overlay transform if active
+                if (exerciseOverlayTransformCallback) {
+                    exerciseOverlayTransformCallback(transform);
                 }
             },
             onUndo: () => {
@@ -1920,6 +1928,7 @@ export class KlApp {
             }
             currentExercise = null;
             exerciseDrawCallback = null;
+            exerciseOverlayTransformCallback = null;
             // Reset stroke data
             exerciseStrokeData = { strokes: [], startTime: 0, endTime: 0 };
             currentExerciseStroke = [];
@@ -2040,6 +2049,29 @@ export class KlApp {
                     exercisePanel.setHasDrawn(true);
                 }
             };
+
+            // Set up transform callback to sync overlay with viewport
+            exerciseOverlayTransformCallback = (transform) => {
+                if (exerciseOverlay) {
+                    exerciseOverlay.setTransform(
+                        transform.x,
+                        transform.y,
+                        transform.scale,
+                        transform.angleDeg
+                    );
+                }
+            };
+
+            // Apply initial transform
+            const initialTransform = this.easel.getTransform();
+            if (exerciseOverlay) {
+                exerciseOverlay.setTransform(
+                    initialTransform.x,
+                    initialTransform.y,
+                    initialTransform.scale,
+                    initialTransform.angleDeg
+                );
+            }
 
             console.log('Exercise mode started:', exercise.title);
         };

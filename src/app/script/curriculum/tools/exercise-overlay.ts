@@ -92,6 +92,18 @@ export class ExerciseOverlay {
         this.svgEl.setAttribute('viewBox', `0 0 ${width} ${height}`);
     }
 
+    /**
+     * Update the overlay transform to match canvas/viewport transform
+     */
+    setTransform(x: number, y: number, scale: number, angleDeg: number = 0): void {
+        // Apply transform to the guide group so guides match canvas position
+        const transform = `translate(${x}px, ${y}px) scale(${scale}) rotate(${angleDeg}deg)`;
+        this.guideGroup.style.transform = transform;
+        this.guideGroup.style.transformOrigin = '0 0';
+        this.feedbackGroup.style.transform = transform;
+        this.feedbackGroup.style.transformOrigin = '0 0';
+    }
+
     setExercise(exercise: TExercise): void {
         this.exercise = exercise;
         this.hitDots.clear();
