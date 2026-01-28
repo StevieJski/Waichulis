@@ -32,3 +32,4 @@ export { LearnUi } from './ui/learn-ui';
 export { ExercisePanel } from './ui/exercise-panel';
 export { AssessmentModal, showAssessmentModal } from './ui/assessment-modal';
 export { ExerciseController } from './ui/exercise-controller';
+export { SettingsPanel } from './ui/settings-panel';
