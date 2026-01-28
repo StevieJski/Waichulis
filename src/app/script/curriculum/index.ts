@@ -31,3 +31,4 @@ export { EaselExercise } from './tools/easel-exercise';
 export { LearnUi } from './ui/learn-ui';
 export { ExercisePanel } from './ui/exercise-panel';
 export { AssessmentModal, showAssessmentModal } from './ui/assessment-modal';
+export { ExerciseController } from './ui/exercise-controller';
