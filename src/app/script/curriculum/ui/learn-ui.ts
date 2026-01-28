@@ -8,8 +8,6 @@ import { LANG } from '../../language/language';
 import { KL } from '../../klecks/kl';
 import { css } from '../../bb/base/base';
 import { progressStore, TProgressStoreListener } from '../storage/progress-store';
-import { apiConfig } from '../api/api-config';
-import { llmClient } from '../api/llm-client';
 import {
     kindergartenCurriculum,
     getExerciseById,
@@ -23,8 +21,8 @@ import {
     TLesson,
     TExercise,
     TCurriculumProgress,
-    TLLMProvider,
 } from '../types';
+import { SettingsPanel } from './settings-panel';
 import * as classes from './learn-ui.module.scss';
 
 // ============================================================================
@@ -400,147 +398,19 @@ export class LearnUi {
     }
 
     private createSettingsPanel(): HTMLElement {
-        const panel = BB.el({
+        const container = BB.el({
             className: classes.settingsPanel,
         });
 
-        // API Provider
-        const providerRow = BB.el({ className: classes.settingsRow });
-        providerRow.append(
-            BB.el({
-                className: classes.settingsLabel,
-                content: LANG('learn-api-provider') + ':',
-            })
-        );
-
-        const providerSelect = new KL.Select({
-            optionArr: [
-                ['none', LANG('learn-api-none')],
-                ['anthropic', 'Anthropic'],
-                ['openai', 'OpenAI'],
-            ],
-            initValue: apiConfig.getProvider(),
-            onChange: (val) => {
-                apiConfig.setProvider(val as TLLMProvider | 'none');
-                llmClient.refreshConfig();
-                this.updateSettingsVisibility();
-            },
-            name: 'api-provider',
-        });
-        providerRow.append(providerSelect.getElement());
-        panel.append(providerRow);
-
-        // API Key input (Anthropic)
-        const anthropicRow = BB.el({
-            className: classes.settingsRow,
-            css: {
-                display: apiConfig.getProvider() === 'anthropic' ? 'flex' : 'none',
+        const settingsPanel = new SettingsPanel({
+            onProgressCleared: async () => {
+                this.progress = await progressStore.startNewSession('kindergarten');
+                this.updateUI();
             },
         });
-        anthropicRow.id = 'anthropic-key-row';
-        anthropicRow.append(
-            BB.el({
-                className: classes.settingsLabel,
-                content: 'API Key:',
-            })
-        );
-        const anthropicInput = BB.el({
-            tagName: 'input',
-            className: classes.settingsInput,
-            custom: {
-                type: 'password',
-                placeholder: 'sk-ant-...',
-                value: apiConfig.getAnthropicApiKey() || '',
-            },
-            onChange: (e: Event) => {
-                const value = (e.target as HTMLInputElement).value;
-                apiConfig.setAnthropicApiKey(value);
-                llmClient.refreshConfig();
-            },
-        }) as HTMLInputElement;
-        anthropicRow.append(anthropicInput);
-        panel.append(anthropicRow);
 
-        // API Key input (OpenAI)
-        const openaiRow = BB.el({
-            className: classes.settingsRow,
-            css: {
-                display: apiConfig.getProvider() === 'openai' ? 'flex' : 'none',
-            },
-        });
-        openaiRow.id = 'openai-key-row';
-        openaiRow.append(
-            BB.el({
-                className: classes.settingsLabel,
-                content: 'API Key:',
-            })
-        );
-        const openaiInput = BB.el({
-            tagName: 'input',
-            className: classes.settingsInput,
-            custom: {
-                type: 'password',
-                placeholder: 'sk-...',
-                value: apiConfig.getOpenAIApiKey() || '',
-            },
-            onChange: (e: Event) => {
-                const value = (e.target as HTMLInputElement).value;
-                apiConfig.setOpenAIApiKey(value);
-                llmClient.refreshConfig();
-            },
-        }) as HTMLInputElement;
-        openaiRow.append(openaiInput);
-        panel.append(openaiRow);
-
-        // Test connection button
-        const testRow = BB.el({ className: classes.settingsRow });
-        const testBtn = BB.el({
-            tagName: 'button',
-            content: LANG('learn-test-connection'),
-            onClick: async () => {
-                testBtn.textContent = LANG('loading') + '...';
-                const result = await llmClient.testConnection();
-                testBtn.textContent = result.success ? '\u2713 ' + result.message : '\u2717 ' + result.message;
-                setTimeout(() => {
-                    testBtn.textContent = LANG('learn-test-connection');
-                }, 3000);
-            },
-        });
-        testRow.append(testBtn);
-        panel.append(testRow);
-
-        // Clear progress button
-        const clearRow = BB.el({ className: classes.settingsRow });
-        const clearBtn = BB.el({
-            tagName: 'button',
-            content: LANG('learn-clear-progress'),
-            onClick: async () => {
-                if (confirm(LANG('learn-clear-progress-confirm'))) {
-                    await progressStore.clearAllProgress();
-                    this.progress = await progressStore.startNewSession('kindergarten');
-                    this.updateUI();
-                }
-            },
-        });
-        clearRow.append(clearBtn);
-        panel.append(clearRow);
-
-        return panel;
-    }
-
-    private updateSettingsVisibility(): void {
-        if (!this.settingsPanelEl) return;
-
-        const provider = apiConfig.getProvider();
-        const anthropicRow = this.settingsPanelEl.querySelector('#anthropic-key-row') as HTMLElement;
-        const openaiRow = this.settingsPanelEl.querySelector('#openai-key-row') as HTMLElement;
-
-        if (anthropicRow) {
-            anthropicRow.style.display = provider === 'anthropic' ? 'flex' : 'none';
-        }
-        if (openaiRow) {
-            openaiRow.style.display = provider === 'openai' ? 'flex' : 'none';
-        }
+        container.append(settingsPanel.getElement());
+        return container;
     }
 
     // ----------------------------------- Actions -----------------------------------
