@@ -84,7 +84,9 @@ import { MobileColorUi } from '../klecks/ui/mobile/mobile-color-ui';
 import { getSelectionPath2d } from '../bb/multi-polygon/get-selection-path-2d';
 import { ExerciseOverlay } from '../curriculum/tools/exercise-overlay';
 import { ExercisePanel } from '../curriculum/ui/exercise-panel';
-import { TExercise } from '../curriculum/types';
+import { showAssessmentModal } from '../curriculum/ui/assessment-modal';
+import { assessmentOrchestrator } from '../curriculum/assessment/assessment-orchestrator';
+import { TExercise, TStrokeData } from '../curriculum/types';
 
 importFilters();
 
@@ -420,6 +422,10 @@ export class KlApp {
         // Track if drawing occurred during exercise mode
         let exerciseDrawCallback: (() => void) | null = null;
 
+        // Stroke data tracking for exercise assessment
+        let exerciseStrokeData: TStrokeData = { strokes: [], startTime: 0, endTime: 0 };
+        let currentExerciseStroke: { x: number; y: number; pressure: number; timestamp: number }[] = [];
+
         drawEventChain.setChainOut(((event: TDrawEvent) => {
             if (event.type === 'down') {
                 this.toolspace.style.pointerEvents = 'none';
@@ -430,16 +436,46 @@ export class KlApp {
                 if (exerciseDrawCallback) {
                     exerciseDrawCallback();
                 }
+                // Track stroke for exercise assessment
+                if (exerciseStrokeData.strokes.length === 0) {
+                    exerciseStrokeData.startTime = Date.now();
+                }
+                currentExerciseStroke = [{
+                    x: event.x,
+                    y: event.y,
+                    pressure: event.pressure,
+                    timestamp: Date.now(),
+                }];
             }
             if (event.type === 'move') {
                 currentBrushUi.goLine(event.x, event.y, event.pressure, event.isCoalesced);
                 this.easelBrush.setLastDrawEvent({ x: event.x, y: event.y });
                 this.easel.requestRender();
+                // Track stroke points
+                if (currentExerciseStroke.length > 0) {
+                    currentExerciseStroke.push({
+                        x: event.x,
+                        y: event.y,
+                        pressure: event.pressure,
+                        timestamp: Date.now(),
+                    });
+                }
             }
             if (event.type === 'up') {
                 this.toolspace.style.pointerEvents = '';
                 currentBrushUi.endLine();
                 this.easel.requestRender();
+                // Save completed stroke
+                if (currentExerciseStroke.length > 0) {
+                    exerciseStrokeData.strokes.push({
+                        id: `stroke-${exerciseStrokeData.strokes.length}`,
+                        points: [...currentExerciseStroke],
+                        color: { r: 0, g: 0, b: 0 },
+                        size: 5,
+                    });
+                    exerciseStrokeData.endTime = Date.now();
+                    currentExerciseStroke = [];
+                }
             }
             if (event.type === 'line') {
                 currentBrushUi.getBrush().drawLineSegment(event.x0, event.y0, event.x1, event.y1);
@@ -1883,6 +1919,9 @@ export class KlApp {
             }
             currentExercise = null;
             exerciseDrawCallback = null;
+            // Reset stroke data
+            exerciseStrokeData = { strokes: [], startTime: 0, endTime: 0 };
+            currentExerciseStroke = [];
         };
 
         const startExerciseMode = (exercise: TExercise) => {
@@ -1915,14 +1954,46 @@ export class KlApp {
             // Create exercise panel
             exercisePanel = new ExercisePanel({
                 onSubmit: async () => {
-                    // For now, show a simple completion message
-                    alert(`Exercise "${exercise.title}" submitted!\n\nIn the full version, this would assess your drawing and provide AI feedback.`);
-                    endExerciseMode();
-                    if (learnUi) {
-                        learnUi.onExerciseCompleted();
+                    // Run assessment on the stroke data
+                    try {
+                        const attemptNumber = assessmentOrchestrator.getAttemptCount(exercise.id) + 1;
+                        const assessment = await assessmentOrchestrator.assess(
+                            exercise,
+                            exerciseStrokeData,
+                            undefined, // canvasSnapshot - could capture for color exercises
+                            'kindergarten'
+                        );
+
+                        // Show assessment modal
+                        const result = await showAssessmentModal({
+                            target: document.body,
+                            exercise,
+                            assessment,
+                            attemptNumber,
+                            onTryAgain: () => {},
+                            onNextExercise: () => {},
+                        });
+
+                        if (result === 'tryAgain') {
+                            // Reset stroke data and clear canvas for retry
+                            exerciseStrokeData = { strokes: [], startTime: 0, endTime: 0 };
+                            currentExerciseStroke = [];
+                            clearLayer(false, true);
+                            if (exercisePanel) {
+                                exercisePanel.setHasDrawn(false);
+                            }
+                        } else {
+                            // 'next' or 'closed' - end exercise mode
+                            endExerciseMode();
+                            if (learnUi) {
+                                learnUi.onExerciseCompleted();
+                            }
+                            mainTabRow?.open('learn');
+                        }
+                    } catch (error) {
+                        console.error('Assessment failed:', error);
+                        alert('Assessment failed. Please try again.');
                     }
-                    // Switch back to Learn tab
-                    mainTabRow?.open('learn');
                 },
                 onCancel: () => {
                     endExerciseMode();
@@ -1932,6 +2003,9 @@ export class KlApp {
                 onClear: () => {
                     // Use the existing clearLayer function
                     clearLayer(false, true);
+                    // Reset stroke data
+                    exerciseStrokeData = { strokes: [], startTime: 0, endTime: 0 };
+                    currentExerciseStroke = [];
                     if (exercisePanel) {
                         exercisePanel.setHasDrawn(false);
                     }
