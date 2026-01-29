@@ -220,6 +220,19 @@ export class IndexedDb {
         });
     }
 
+    async getAll(store: string): Promise<unknown[]> {
+        return this.autoDisconnectWrapper(async () => {
+            await this.openDb();
+            return await new Promise((resolve, reject) => {
+                const { transaction, objectStore } = this.getTransaction(store, 'readonly');
+                transaction.onabort = () => reject(transaction.error);
+                const request = objectStore.getAll();
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        });
+    }
+
     async remove(store: string, key: IDBValidKey): Promise<void> {
         return this.autoDisconnectWrapper(async () => {
             await this.openDb();
