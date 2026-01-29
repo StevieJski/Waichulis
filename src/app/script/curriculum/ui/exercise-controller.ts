@@ -16,7 +16,12 @@ import { llmClient } from '../api/llm-client';
 import { ExerciseOverlay } from '../tools/exercise-overlay';
 import { ExercisePanel } from './exercise-panel';
 import { showAssessmentModal } from './assessment-modal';
-import { getExerciseById, getLessonById, kindergartenCurriculum } from '../data/kindergarten';
+import {
+    getExerciseById,
+    getLessonById,
+    getCurriculum,
+    getGradeForExercise,
+} from '../data/index';
 
 // ============================================================================
 // Types
@@ -322,8 +327,15 @@ export class ExerciseController {
             return lesson.exercises[currentIndex + 1];
         }
 
+        // Get the curriculum for this exercise's grade
+        const gradeLevel = getGradeForExercise(currentExercise.id);
+        if (!gradeLevel) return null;
+
+        const curriculum = getCurriculum(gradeLevel);
+        if (!curriculum) return null;
+
         // End of lesson - find next lesson
-        const unit = kindergartenCurriculum.units.find((u) => u.id === lesson.unit);
+        const unit = curriculum.units.find((u) => u.id === lesson.unit);
         if (!unit) return null;
 
         const lessonIndex = unit.lessons.findIndex((l) => l.id === lesson.id);
@@ -333,9 +345,9 @@ export class ExerciseController {
         }
 
         // End of unit - find next unit
-        const unitIndex = kindergartenCurriculum.units.findIndex((u) => u.id === unit.id);
-        if (unitIndex >= 0 && unitIndex < kindergartenCurriculum.units.length - 1) {
-            const nextUnit = kindergartenCurriculum.units[unitIndex + 1];
+        const unitIndex = curriculum.units.findIndex((u) => u.id === unit.id);
+        if (unitIndex >= 0 && unitIndex < curriculum.units.length - 1) {
+            const nextUnit = curriculum.units[unitIndex + 1];
             if (nextUnit.lessons.length > 0 && nextUnit.lessons[0].exercises.length > 0) {
                 return nextUnit.lessons[0].exercises[0];
             }

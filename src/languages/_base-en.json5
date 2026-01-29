@@ -1088,6 +1088,9 @@ Renaming a key across multiple language files:
     value: "Grade Level"
   },
   "learn-grade-kindergarten": "Kindergarten",
+  "learn-grade-grade1": "Grade 1",
+  "learn-grade-grade2": "Grade 2",
+  "learn-grade-grade3": "Grade 3",
   "learn-unit-line": "Lines",
   "learn-unit-shape": "Shapes",
   "learn-unit-color": "Colors",

@@ -9,12 +9,14 @@ import { KL } from '../../klecks/kl';
 import { css } from '../../bb/base/base';
 import { progressStore, TProgressStoreListener } from '../storage/progress-store';
 import {
-    kindergartenCurriculum,
+    getCurriculum,
     getExerciseById,
     getLessonById,
     getUnitById,
     getTotalExerciseCount,
-} from '../data/kindergarten';
+    availableGrades,
+    getGradeDisplayName,
+} from '../data/index';
 import {
     TGradeLevel,
     TUnit,
@@ -34,6 +36,7 @@ export type TLearnUiParams = {
 };
 
 type TViewState = {
+    selectedGrade: TGradeLevel;
     selectedUnit: TUnit;
     expandedLessonId: string | null;
     showSettings: boolean;
@@ -60,6 +63,7 @@ export class LearnUi {
     constructor(params: TLearnUiParams) {
         this.params = params;
         this.viewState = {
+            selectedGrade: 'kindergarten',
             selectedUnit: 'line',
             expandedLessonId: null,
             showSettings: false,
@@ -141,11 +145,20 @@ export class LearnUi {
             content: LANG('learn-grade-level') + ':',
         });
 
+        // Build options from available grades using language translations
+        const gradeOptions: [string, string][] = availableGrades.map((grade) => [
+            grade,
+            LANG(`learn-grade-${grade}` as any),
+        ]);
+
         const gradeSelect = new KL.Select({
-            optionArr: [['kindergarten', LANG('learn-grade-kindergarten')]],
-            initValue: 'kindergarten',
-            onChange: () => {
-                // Only kindergarten supported for now
+            optionArr: gradeOptions,
+            initValue: this.viewState.selectedGrade,
+            onChange: (newGrade: string) => {
+                this.viewState.selectedGrade = newGrade as TGradeLevel;
+                this.viewState.selectedUnit = 'line';
+                this.viewState.expandedLessonId = null;
+                this.updateUI();
             },
             name: 'grade-level',
         });
@@ -187,7 +200,7 @@ export class LearnUi {
             className: classes.lessonList,
         });
 
-        const unit = getUnitById(this.viewState.selectedUnit);
+        const unit = getUnitById(this.viewState.selectedUnit, this.viewState.selectedGrade);
         if (!unit) {
             list.append(
                 BB.el({
@@ -360,7 +373,7 @@ export class LearnUi {
             className: classes.overallProgress,
         });
 
-        const totalExercises = getTotalExerciseCount();
+        const totalExercises = getTotalExerciseCount(this.viewState.selectedGrade);
         const completionPercent = progressStore.getOverallCompletionPercent(totalExercises);
 
         const label = BB.el({
@@ -446,6 +459,9 @@ export class LearnUi {
     private continueOrStart(): void {
         // Find the next exercise to do
         let nextExercise: TExercise | undefined;
+        const curriculum = getCurriculum(this.viewState.selectedGrade);
+
+        if (!curriculum) return;
 
         // If there's a current exercise, continue from there
         if (this.progress?.currentExerciseId) {
@@ -454,7 +470,7 @@ export class LearnUi {
 
         // Otherwise find the first incomplete exercise
         if (!nextExercise) {
-            for (const unit of kindergartenCurriculum.units) {
+            for (const unit of curriculum.units) {
                 for (const lesson of unit.lessons) {
                     for (const exercise of lesson.exercises) {
                         const progress = progressStore.getExerciseProgress(
@@ -475,7 +491,7 @@ export class LearnUi {
 
         // If still no exercise, start from the beginning
         if (!nextExercise) {
-            const firstUnit = kindergartenCurriculum.units[0];
+            const firstUnit = curriculum.units[0];
             const firstLesson = firstUnit?.lessons[0];
             nextExercise = firstLesson?.exercises[0];
         }
