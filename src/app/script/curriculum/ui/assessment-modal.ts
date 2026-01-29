@@ -337,7 +337,7 @@ export class AssessmentModal {
             },
             content: LANG('learn-exercise-try-again'),
             onClick: () => {
-                this.close();
+                this.removeFromDom();
                 this.params.onTryAgain();
             },
         });
@@ -359,7 +359,7 @@ export class AssessmentModal {
                 },
                 content: LANG('learn-exercise-next'),
                 onClick: () => {
-                    this.close();
+                    this.removeFromDom();
                     this.params.onNextExercise();
                 },
             });
@@ -369,10 +369,14 @@ export class AssessmentModal {
         return section;
     }
 
-    private close(): void {
+    private removeFromDom(): void {
         if (this.rootEl.parentNode) {
             this.rootEl.parentNode.removeChild(this.rootEl);
         }
+    }
+
+    private close(): void {
+        this.removeFromDom();
         this.params.onClose();
     }
 

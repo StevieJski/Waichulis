@@ -88,6 +88,7 @@ import { showAssessmentModal } from '../curriculum/ui/assessment-modal';
 import { assessmentOrchestrator } from '../curriculum/assessment/assessment-orchestrator';
 import { progressStore } from '../curriculum/storage/progress-store';
 import { TExercise, TStrokeData } from '../curriculum/types';
+import { getLessonById, kindergartenCurriculum } from '../curriculum/data/kindergarten';
 
 importFilters();
 
@@ -1936,28 +1937,30 @@ export class KlApp {
 
         // Helper to clear just the user's drawing (not background)
         const clearUserDrawing = () => {
+            const layerCount = this.klCanvas.getLayerCount();
             console.log('=== clearUserDrawing ===');
-            console.log('currentLayer.index:', currentLayer.index);
-            console.log('layer count:', this.klCanvas.getLayerCount());
-            console.log('canvas size:', currentLayer.canvas.width, 'x', currentLayer.canvas.height);
+            console.log('layer count:', layerCount);
 
-            // Try multiple approaches to clear
+            // Use klCanvas.eraseLayer() to properly update history
+            // Then refill base layer with white
+            for (let i = 0; i < layerCount; i++) {
+                console.log(`Clearing layer ${i}`);
+                this.klCanvas.eraseLayer({
+                    layerIndex: i,
+                    useAlphaLock: false,
+                    useSelection: false,
+                });
+            }
 
-            // Approach 1: Direct context clear
-            const ctx = currentLayer.context;
+            // Refill base layer (index 0) with white background
+            const baseLayer = this.klCanvas.getLayer(0);
+            const ctx = baseLayer.context;
             ctx.save();
             ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.clearRect(0, 0, currentLayer.canvas.width, currentLayer.canvas.height);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, baseLayer.canvas.width, baseLayer.canvas.height);
             ctx.restore();
-            console.log('Direct clearRect done');
-
-            // Approach 2: klCanvas eraseLayer
-            this.klCanvas.eraseLayer({
-                layerIndex: currentLayer.index,
-                useAlphaLock: false,
-                useSelection: false,
-            });
-            console.log('eraseLayer done');
+            console.log('Filled base layer with white');
 
             // Force render update
             this.easelProjectUpdater.update();
@@ -1967,6 +1970,39 @@ export class KlApp {
             // Reset stroke data
             exerciseStrokeData = { strokes: [], startTime: 0, endTime: 0 };
             currentExerciseStroke = [];
+        };
+
+        // Find the next exercise in the curriculum sequence
+        const findNextExercise = (currentEx: TExercise): TExercise | null => {
+            const lesson = getLessonById(currentEx.lessonId);
+            if (!lesson) return null;
+
+            // Find next exercise in same lesson
+            const currentIndex = lesson.exercises.findIndex((e) => e.id === currentEx.id);
+            if (currentIndex >= 0 && currentIndex < lesson.exercises.length - 1) {
+                return lesson.exercises[currentIndex + 1];
+            }
+
+            // End of lesson - find next lesson in same unit
+            const unit = kindergartenCurriculum.units.find((u) => u.id === lesson.unit);
+            if (!unit) return null;
+
+            const lessonIndex = unit.lessons.findIndex((l) => l.id === lesson.id);
+            if (lessonIndex >= 0 && lessonIndex < unit.lessons.length - 1) {
+                const nextLesson = unit.lessons[lessonIndex + 1];
+                return nextLesson.exercises[0] || null;
+            }
+
+            // End of unit - find next unit
+            const unitIndex = kindergartenCurriculum.units.findIndex((u) => u.id === unit.id);
+            if (unitIndex >= 0 && unitIndex < kindergartenCurriculum.units.length - 1) {
+                const nextUnit = kindergartenCurriculum.units[unitIndex + 1];
+                if (nextUnit.lessons.length > 0 && nextUnit.lessons[0].exercises.length > 0) {
+                    return nextUnit.lessons[0].exercises[0];
+                }
+            }
+
+            return null; // No more exercises
         };
 
         const startExerciseMode = (exercise: TExercise) => {
@@ -2032,12 +2068,28 @@ export class KlApp {
 
                         if (result === 'tryAgain') {
                             // Clear drawing and reset for retry (keep overlay intact)
+                            console.log('Modal tryAgain - clearing');
                             clearUserDrawing();
                             if (exercisePanel) {
                                 exercisePanel.setHasDrawn(false);
                             }
+                        } else if (result === 'next') {
+                            // Find and start the next exercise
+                            const nextExercise = findNextExercise(exercise);
+                            clearUserDrawing();
+                            endExerciseMode();
+                            if (learnUi) {
+                                learnUi.onExerciseCompleted();
+                            }
+                            if (nextExercise) {
+                                startExerciseMode(nextExercise);
+                            } else {
+                                // No more exercises - go back to Learn tab
+                                mainTabRow?.open('learn');
+                            }
                         } else {
-                            // 'next' or 'closed' - end exercise mode
+                            // 'closed' - end exercise mode and go back to Learn tab
+                            clearUserDrawing();
                             endExerciseMode();
                             if (learnUi) {
                                 learnUi.onExerciseCompleted();
@@ -2072,9 +2124,9 @@ export class KlApp {
             // Append panel to easel
             easelEl.appendChild(exercisePanel.getElement());
 
-            // Switch to brush tool
+            // Switch to brush tool but keep Learn tab open
             this.easel.setTool('brush');
-            mainTabRow.open('brush');
+            mainTabRow.open('learn');
 
             // Set up draw callback to track when user draws
             exerciseDrawCallback = () => {
