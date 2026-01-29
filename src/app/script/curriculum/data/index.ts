@@ -7,6 +7,7 @@ import { TGradeCurriculum, TGradeLevel, TCurriculumUnit, TLesson, TExercise } fr
 import { kindergartenCurriculum } from './kindergarten';
 import { grade1Curriculum } from './grade1';
 import { grade2Curriculum } from './grade2';
+import { grade3Curriculum } from './grade3';
 
 // ============================================================================
 // Curriculum Registry
@@ -19,13 +20,13 @@ export const curriculumRegistry: Record<TGradeLevel, TGradeCurriculum> = {
     kindergarten: kindergartenCurriculum,
     grade1: grade1Curriculum,
     grade2: grade2Curriculum,
-    grade3: null as unknown as TGradeCurriculum, // Placeholder
+    grade3: grade3Curriculum,
 };
 
 /**
  * Grade levels that have curriculum content implemented
  */
-export const availableGrades: TGradeLevel[] = ['kindergarten', 'grade1', 'grade2'];
+export const availableGrades: TGradeLevel[] = ['kindergarten', 'grade1', 'grade2', 'grade3'];
 
 /**
  * Check if a grade level has curriculum content
@@ -192,3 +193,4 @@ export function getGradeDisplayName(gradeLevel: TGradeLevel): string {
 export { kindergartenCurriculum } from './kindergarten';
 export { grade1Curriculum } from './grade1';
 export { grade2Curriculum } from './grade2';
+export { grade3Curriculum } from './grade3';
