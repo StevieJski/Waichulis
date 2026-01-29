@@ -42,6 +42,7 @@ export class SettingsPanel {
         this.rootEl = BB.el({
             css: {
                 padding: '16px',
+                overflow: 'hidden',
             },
         }) as HTMLDivElement;
 
@@ -129,7 +130,7 @@ export class SettingsPanel {
         const labelEl = BB.el({
             css: {
                 fontSize: '13px',
-                minWidth: '100px',
+                minWidth: '90px',
                 flexShrink: '0',
             },
             content: label,
@@ -138,6 +139,8 @@ export class SettingsPanel {
         const contentWrapper = BB.el({
             css: {
                 flex: '1',
+                minWidth: '0',
+                overflow: 'hidden',
             },
         });
         contentWrapper.appendChild(content);
@@ -192,7 +195,8 @@ export class SettingsPanel {
         const googleLabel = BB.el({
             css: {
                 fontSize: '13px',
-                minWidth: '100px',
+                minWidth: '90px',
+                flexShrink: '0',
             },
             content: 'Google Key:',
         });
@@ -201,6 +205,8 @@ export class SettingsPanel {
             tagName: 'input',
             css: {
                 flex: '1',
+                minWidth: '0',
+                maxWidth: '180px',
                 padding: '6px 8px',
                 border: '1px solid var(--kl-color-ui-border, #ccc)',
                 borderRadius: '4px',
@@ -212,12 +218,29 @@ export class SettingsPanel {
                 placeholder: 'AIza...',
                 value: apiConfig.getGoogleApiKey() || '',
             },
-            onChange: (e: Event) => {
-                const value = (e.target as HTMLInputElement).value;
-                apiConfig.setGoogleApiKey(value);
-                llmClient.refreshConfig();
-            },
         }) as HTMLInputElement;
+
+        // Use addEventListener for input changes
+        this.googleKeyInput.addEventListener('input', () => {
+            apiConfig.setGoogleApiKey(this.googleKeyInput!.value);
+            llmClient.refreshConfig();
+        });
+
+        // Handle paste manually since global handler blocks it
+        this.googleKeyInput.addEventListener('paste', (e: ClipboardEvent) => {
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            const pastedText = e.clipboardData?.getData('text') || '';
+            const input = this.googleKeyInput!;
+            const start = input.selectionStart || 0;
+            const end = input.selectionEnd || 0;
+            const currentValue = input.value;
+            input.value = currentValue.slice(0, start) + pastedText + currentValue.slice(end);
+            input.selectionStart = input.selectionEnd = start + pastedText.length;
+            apiConfig.setGoogleApiKey(input.value);
+            llmClient.refreshConfig();
+            e.preventDefault();
+        }, true);
 
         googleRow.appendChild(googleLabel);
         googleRow.appendChild(this.googleKeyInput);
@@ -227,12 +250,12 @@ export class SettingsPanel {
         const googleInfo = BB.el({
             id: 'google-key-info',
             css: {
-                fontSize: '11px',
+                fontSize: '10px',
                 opacity: '0.7',
-                marginLeft: '110px',
                 marginTop: '-4px',
+                paddingLeft: '100px',
             },
-            content: 'Get free key at aistudio.google.com',
+            content: 'Free key: aistudio.google.com',
         });
         container.appendChild(googleInfo);
 
@@ -249,7 +272,8 @@ export class SettingsPanel {
         const anthropicLabel = BB.el({
             css: {
                 fontSize: '13px',
-                minWidth: '100px',
+                minWidth: '90px',
+                flexShrink: '0',
             },
             content: 'Anthropic Key:',
         });
@@ -258,6 +282,8 @@ export class SettingsPanel {
             tagName: 'input',
             css: {
                 flex: '1',
+                minWidth: '0',
+                maxWidth: '180px',
                 padding: '6px 8px',
                 border: '1px solid var(--kl-color-ui-border, #ccc)',
                 borderRadius: '4px',
@@ -269,12 +295,27 @@ export class SettingsPanel {
                 placeholder: 'sk-ant-...',
                 value: apiConfig.getAnthropicApiKey() || '',
             },
-            onChange: (e: Event) => {
-                const value = (e.target as HTMLInputElement).value;
-                apiConfig.setAnthropicApiKey(value);
-                llmClient.refreshConfig();
-            },
         }) as HTMLInputElement;
+
+        this.anthropicKeyInput.addEventListener('input', () => {
+            apiConfig.setAnthropicApiKey(this.anthropicKeyInput!.value);
+            llmClient.refreshConfig();
+        });
+
+        this.anthropicKeyInput.addEventListener('paste', (e: ClipboardEvent) => {
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            const pastedText = e.clipboardData?.getData('text') || '';
+            const input = this.anthropicKeyInput!;
+            const start = input.selectionStart || 0;
+            const end = input.selectionEnd || 0;
+            const currentValue = input.value;
+            input.value = currentValue.slice(0, start) + pastedText + currentValue.slice(end);
+            input.selectionStart = input.selectionEnd = start + pastedText.length;
+            apiConfig.setAnthropicApiKey(input.value);
+            llmClient.refreshConfig();
+            e.preventDefault();
+        }, true);
 
         anthropicRow.appendChild(anthropicLabel);
         anthropicRow.appendChild(this.anthropicKeyInput);
@@ -293,7 +334,8 @@ export class SettingsPanel {
         const openaiLabel = BB.el({
             css: {
                 fontSize: '13px',
-                minWidth: '100px',
+                minWidth: '90px',
+                flexShrink: '0',
             },
             content: 'OpenAI Key:',
         });
@@ -302,6 +344,8 @@ export class SettingsPanel {
             tagName: 'input',
             css: {
                 flex: '1',
+                minWidth: '0',
+                maxWidth: '180px',
                 padding: '6px 8px',
                 border: '1px solid var(--kl-color-ui-border, #ccc)',
                 borderRadius: '4px',
@@ -313,12 +357,27 @@ export class SettingsPanel {
                 placeholder: 'sk-...',
                 value: apiConfig.getOpenAIApiKey() || '',
             },
-            onChange: (e: Event) => {
-                const value = (e.target as HTMLInputElement).value;
-                apiConfig.setOpenAIApiKey(value);
-                llmClient.refreshConfig();
-            },
         }) as HTMLInputElement;
+
+        this.openaiKeyInput.addEventListener('input', () => {
+            apiConfig.setOpenAIApiKey(this.openaiKeyInput!.value);
+            llmClient.refreshConfig();
+        });
+
+        this.openaiKeyInput.addEventListener('paste', (e: ClipboardEvent) => {
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            const pastedText = e.clipboardData?.getData('text') || '';
+            const input = this.openaiKeyInput!;
+            const start = input.selectionStart || 0;
+            const end = input.selectionEnd || 0;
+            const currentValue = input.value;
+            input.value = currentValue.slice(0, start) + pastedText + currentValue.slice(end);
+            input.selectionStart = input.selectionEnd = start + pastedText.length;
+            apiConfig.setOpenAIApiKey(input.value);
+            llmClient.refreshConfig();
+            e.preventDefault();
+        }, true);
 
         openaiRow.appendChild(openaiLabel);
         openaiRow.appendChild(this.openaiKeyInput);
@@ -362,12 +421,12 @@ export class SettingsPanel {
         const info = BB.el({
             id: 'model-cost-info',
             css: {
-                fontSize: '11px',
+                fontSize: '10px',
                 opacity: '0.7',
-                marginLeft: '110px',
-                marginTop: '-8px',
+                marginTop: '-4px',
+                paddingLeft: '100px',
             },
-            content: 'Gemini: FREE | Haiku/Mini: ~$0.001/call | Sonnet/4o: ~$0.01/call',
+            content: 'Gemini: FREE | Others: paid',
         });
         container.appendChild(info);
 
