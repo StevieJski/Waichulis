@@ -11,6 +11,7 @@ import { TAPISettings, TLLMModel, TLLMProvider } from '../types';
 // ============================================================================
 
 const LS_API_PROVIDER_KEY = 'klecks-curriculum-api-provider';
+const LS_GOOGLE_KEY = 'klecks-curriculum-google-key';
 const LS_ANTHROPIC_KEY = 'klecks-curriculum-anthropic-key';
 const LS_OPENAI_KEY = 'klecks-curriculum-openai-key';
 const LS_FEEDBACK_MODEL_KEY = 'klecks-curriculum-feedback-model';
@@ -23,8 +24,8 @@ const LS_OFFLINE_MODE_KEY = 'klecks-curriculum-offline-mode';
 
 const DEFAULT_SETTINGS: TAPISettings = {
     provider: 'none',
-    feedbackModel: 'claude-3-5-haiku-latest',
-    visionModel: 'claude-3-5-sonnet-latest',
+    feedbackModel: 'gemini-2.0-flash',
+    visionModel: 'gemini-2.5-flash',
     offlineMode: true,
 };
 
@@ -72,6 +73,10 @@ export class APIConfig {
         return this.settings.provider;
     }
 
+    getGoogleApiKey(): string | undefined {
+        return this.settings.googleApiKey;
+    }
+
     getAnthropicApiKey(): string | undefined {
         return this.settings.anthropicApiKey;
     }
@@ -98,6 +103,7 @@ export class APIConfig {
     isLLMAvailable(): boolean {
         if (this.settings.offlineMode) return false;
         if (this.settings.provider === 'none') return false;
+        if (this.settings.provider === 'google' && !this.settings.googleApiKey) return false;
         if (this.settings.provider === 'anthropic' && !this.settings.anthropicApiKey) return false;
         if (this.settings.provider === 'openai' && !this.settings.openaiApiKey) return false;
         return true;
@@ -107,6 +113,9 @@ export class APIConfig {
      * Get the active API key for the current provider
      */
     getActiveApiKey(): string | undefined {
+        if (this.settings.provider === 'google') {
+            return this.settings.googleApiKey;
+        }
         if (this.settings.provider === 'anthropic') {
             return this.settings.anthropicApiKey;
         }
@@ -121,6 +130,15 @@ export class APIConfig {
     setProvider(provider: TLLMProvider | 'none'): void {
         this.settings.provider = provider;
         LocalStorage.setItem(LS_API_PROVIDER_KEY, provider);
+    }
+
+    setGoogleApiKey(key: string): void {
+        this.settings.googleApiKey = key;
+        if (key) {
+            LocalStorage.setItem(LS_GOOGLE_KEY, obfuscate(key));
+        } else {
+            LocalStorage.removeItem(LS_GOOGLE_KEY);
+        }
     }
 
     setAnthropicApiKey(key: string): void {
@@ -164,6 +182,11 @@ export class APIConfig {
     validateApiKeyFormat(key: string, provider: TLLMProvider): boolean {
         if (!key || key.trim().length === 0) return false;
 
+        if (provider === 'google') {
+            // Google AI API keys start with "AIza"
+            return key.startsWith('AIza') && key.length > 20;
+        }
+
         if (provider === 'anthropic') {
             // Anthropic keys start with "sk-ant-"
             return key.startsWith('sk-ant-') && key.length > 20;
@@ -181,6 +204,7 @@ export class APIConfig {
 
     private loadSettings(): TAPISettings {
         const provider = LocalStorage.getItem(LS_API_PROVIDER_KEY) as TLLMProvider | 'none' | null;
+        const googleKey = LocalStorage.getItem(LS_GOOGLE_KEY);
         const anthropicKey = LocalStorage.getItem(LS_ANTHROPIC_KEY);
         const openaiKey = LocalStorage.getItem(LS_OPENAI_KEY);
         const feedbackModel = LocalStorage.getItem(LS_FEEDBACK_MODEL_KEY) as TLLMModel | null;
@@ -189,6 +213,7 @@ export class APIConfig {
 
         return {
             provider: provider || DEFAULT_SETTINGS.provider,
+            googleApiKey: googleKey ? deobfuscate(googleKey) : undefined,
             anthropicApiKey: anthropicKey ? deobfuscate(anthropicKey) : undefined,
             openaiApiKey: openaiKey ? deobfuscate(openaiKey) : undefined,
             feedbackModel: feedbackModel || DEFAULT_SETTINGS.feedbackModel,

@@ -29,6 +29,7 @@ export class SettingsPanel {
 
     // Form elements
     private providerSelect: ReturnType<typeof KL.Select> | null = null;
+    private googleKeyInput: HTMLInputElement | null = null;
     private anthropicKeyInput: HTMLInputElement | null = null;
     private openaiKeyInput: HTMLInputElement | null = null;
     private feedbackModelSelect: ReturnType<typeof KL.Select> | null = null;
@@ -153,6 +154,7 @@ export class SettingsPanel {
         this.providerSelect = new KL.Select({
             optionArr: [
                 ['none', 'None (Offline)'],
+                ['google', 'Google (Gemini) - FREE'],
                 ['anthropic', 'Anthropic (Claude)'],
                 ['openai', 'OpenAI (GPT-4)'],
             ],
@@ -176,6 +178,63 @@ export class SettingsPanel {
                 gap: '8px',
             },
         });
+
+        // Google API Key
+        const googleRow = BB.el({
+            id: 'google-key-row',
+            css: {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+            },
+        });
+
+        const googleLabel = BB.el({
+            css: {
+                fontSize: '13px',
+                minWidth: '100px',
+            },
+            content: 'Google Key:',
+        });
+
+        this.googleKeyInput = BB.el({
+            tagName: 'input',
+            css: {
+                flex: '1',
+                padding: '6px 8px',
+                border: '1px solid var(--kl-color-ui-border, #ccc)',
+                borderRadius: '4px',
+                fontSize: '12px',
+                fontFamily: 'monospace',
+            },
+            custom: {
+                type: 'password',
+                placeholder: 'AIza...',
+                value: apiConfig.getGoogleApiKey() || '',
+            },
+            onChange: (e: Event) => {
+                const value = (e.target as HTMLInputElement).value;
+                apiConfig.setGoogleApiKey(value);
+                llmClient.refreshConfig();
+            },
+        }) as HTMLInputElement;
+
+        googleRow.appendChild(googleLabel);
+        googleRow.appendChild(this.googleKeyInput);
+        container.appendChild(googleRow);
+
+        // Google key info
+        const googleInfo = BB.el({
+            id: 'google-key-info',
+            css: {
+                fontSize: '11px',
+                opacity: '0.7',
+                marginLeft: '110px',
+                marginTop: '-4px',
+            },
+            content: 'Get free key at aistudio.google.com',
+        });
+        container.appendChild(googleInfo);
 
         // Anthropic API Key
         const anthropicRow = BB.el({
@@ -281,9 +340,12 @@ export class SettingsPanel {
         // Feedback model
         this.feedbackModelSelect = new KL.Select({
             optionArr: [
-                ['claude-3-5-haiku-latest', 'Claude 3.5 Haiku (Fast, Cheap)'],
+                ['gemini-2.0-flash', 'Gemini 2.0 Flash (Fast, FREE)'],
+                ['gemini-2.5-flash', 'Gemini 2.5 Flash (FREE)'],
+                ['gemini-2.5-pro', 'Gemini 2.5 Pro (Best, FREE)'],
+                ['claude-3-5-haiku-latest', 'Claude 3.5 Haiku (Fast)'],
                 ['claude-3-5-sonnet-latest', 'Claude 3.5 Sonnet (Better)'],
-                ['gpt-4o-mini', 'GPT-4o Mini (Fast, Cheap)'],
+                ['gpt-4o-mini', 'GPT-4o Mini (Fast)'],
                 ['gpt-4o', 'GPT-4o (Better)'],
             ],
             initValue: apiConfig.getFeedbackModel(),
@@ -298,13 +360,14 @@ export class SettingsPanel {
 
         // Info about models
         const info = BB.el({
+            id: 'model-cost-info',
             css: {
                 fontSize: '11px',
                 opacity: '0.7',
                 marginLeft: '110px',
                 marginTop: '-8px',
             },
-            content: 'Haiku/Mini: ~$0.001/call | Sonnet/4o: ~$0.01/call',
+            content: 'Gemini: FREE | Haiku/Mini: ~$0.001/call | Sonnet/4o: ~$0.01/call',
         });
         container.appendChild(info);
 
@@ -525,6 +588,18 @@ export class SettingsPanel {
     private updateVisibility(): void {
         const provider = apiConfig.getProvider();
         const isOffline = apiConfig.isOfflineMode();
+
+        // Google key row
+        const googleRow = this.rootEl.querySelector('#google-key-row') as HTMLElement;
+        if (googleRow) {
+            googleRow.style.display = provider === 'google' ? 'flex' : 'none';
+        }
+
+        // Google key info
+        const googleInfo = this.rootEl.querySelector('#google-key-info') as HTMLElement;
+        if (googleInfo) {
+            googleInfo.style.display = provider === 'google' ? 'block' : 'none';
+        }
 
         // Anthropic key row
         const anthropicRow = this.rootEl.querySelector('#anthropic-key-row') as HTMLElement;

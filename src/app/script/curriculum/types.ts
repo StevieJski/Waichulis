@@ -273,9 +273,12 @@ export type TLocalAssessment = {
 // LLM Feedback Types
 // ============================================================================
 
-export type TLLMProvider = 'anthropic' | 'openai';
+export type TLLMProvider = 'google' | 'anthropic' | 'openai';
 
 export type TLLMModel =
+    | 'gemini-2.0-flash'
+    | 'gemini-2.5-flash'
+    | 'gemini-2.5-pro'
     | 'claude-3-5-haiku-latest'
     | 'claude-3-5-sonnet-latest'
     | 'gpt-4o-mini'
@@ -383,6 +386,7 @@ export type TStoredProgress = {
 
 export type TAPISettings = {
     provider: TLLMProvider | 'none';
+    googleApiKey?: string;
     anthropicApiKey?: string;
     openaiApiKey?: string;
     feedbackModel: TLLMModel;

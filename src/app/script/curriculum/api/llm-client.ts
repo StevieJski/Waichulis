@@ -51,6 +51,19 @@ type TOpenAIResponse = {
     choices: { message: { content: string } }[];
 };
 
+type TGoogleContentPart =
+    | { text: string }
+    | { inlineData: { mimeType: string; data: string } };
+
+type TGoogleContent = {
+    role?: 'user' | 'model';
+    parts: TGoogleContentPart[];
+};
+
+type TGoogleResponse = {
+    candidates: { content: { parts: { text: string }[] } }[];
+};
+
 type THelpResponse = {
     tips: string[];
     encouragement: string;
@@ -250,7 +263,9 @@ export class LLMClient {
             throw new Error('LLM not configured');
         }
 
-        if (this.config.provider === 'anthropic') {
+        if (this.config.provider === 'google') {
+            return this.sendGoogleMessage(userMessage, systemPrompt, model);
+        } else if (this.config.provider === 'anthropic') {
             return this.sendAnthropicMessage(userMessage, systemPrompt, model);
         } else {
             return this.sendOpenAIMessage(userMessage, systemPrompt, model);
@@ -267,11 +282,95 @@ export class LLMClient {
             throw new Error('LLM not configured');
         }
 
-        if (this.config.provider === 'anthropic') {
+        if (this.config.provider === 'google') {
+            return this.sendGoogleMessageWithImage(userMessage, base64Image, systemPrompt, model);
+        } else if (this.config.provider === 'anthropic') {
             return this.sendAnthropicMessageWithImage(userMessage, base64Image, systemPrompt, model);
         } else {
             return this.sendOpenAIMessageWithImage(userMessage, base64Image, systemPrompt, model);
         }
+    }
+
+    private async sendGoogleMessage(
+        userMessage: string,
+        systemPrompt: string,
+        model: TLLMModel
+    ): Promise<string> {
+        const googleModel = this.mapToGoogleModel(model);
+
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${googleModel}:generateContent?key=${this.config!.apiKey}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: userMessage }] }] as TGoogleContent[],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    generationConfig: {
+                        maxOutputTokens: 1024,
+                    },
+                }),
+            }
+        );
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`Google API error: ${response.status} - ${error}`);
+        }
+
+        const data = (await response.json()) as TGoogleResponse;
+        return data.candidates[0]?.content?.parts[0]?.text || '';
+    }
+
+    private async sendGoogleMessageWithImage(
+        userMessage: string,
+        base64Image: string,
+        systemPrompt: string,
+        model: TLLMModel
+    ): Promise<string> {
+        const googleModel = this.mapToGoogleModel(model);
+
+        // Remove data URL prefix if present
+        const imageData = base64Image.replace(/^data:image\/\w+;base64,/, '');
+
+        const parts: TGoogleContentPart[] = [
+            {
+                inlineData: {
+                    mimeType: 'image/png',
+                    data: imageData,
+                },
+            },
+            {
+                text: userMessage,
+            },
+        ];
+
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${googleModel}:generateContent?key=${this.config!.apiKey}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    contents: [{ parts }] as TGoogleContent[],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    generationConfig: {
+                        maxOutputTokens: 1024,
+                    },
+                }),
+            }
+        );
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`Google API error: ${response.status} - ${error}`);
+        }
+
+        const data = (await response.json()) as TGoogleResponse;
+        return data.candidates[0]?.content?.parts[0]?.text || '';
     }
 
     private async sendAnthropicMessage(
@@ -429,14 +528,31 @@ export class LLMClient {
     }
 
     private mapToOpenAIModel(model: TLLMModel): string {
-        // Map Anthropic models to OpenAI equivalents when using OpenAI provider
+        // Map models to OpenAI equivalents when using OpenAI provider
         const mapping: Record<TLLMModel, string> = {
+            'gemini-2.0-flash': 'gpt-4o-mini',
+            'gemini-2.5-flash': 'gpt-4o-mini',
+            'gemini-2.5-pro': 'gpt-4o',
             'claude-3-5-haiku-latest': 'gpt-4o-mini',
             'claude-3-5-sonnet-latest': 'gpt-4o',
             'gpt-4o-mini': 'gpt-4o-mini',
             'gpt-4o': 'gpt-4o',
         };
         return mapping[model] || 'gpt-4o-mini';
+    }
+
+    private mapToGoogleModel(model: TLLMModel): string {
+        // Map models to Google Gemini equivalents when using Google provider
+        const mapping: Record<TLLMModel, string> = {
+            'gemini-2.0-flash': 'gemini-2.0-flash',
+            'gemini-2.5-flash': 'gemini-2.5-flash',
+            'gemini-2.5-pro': 'gemini-2.5-pro',
+            'claude-3-5-haiku-latest': 'gemini-2.0-flash',
+            'claude-3-5-sonnet-latest': 'gemini-2.5-flash',
+            'gpt-4o-mini': 'gemini-2.0-flash',
+            'gpt-4o': 'gemini-2.5-flash',
+        };
+        return mapping[model] || 'gemini-2.0-flash';
     }
 
     private parseFeedbackResponse(
