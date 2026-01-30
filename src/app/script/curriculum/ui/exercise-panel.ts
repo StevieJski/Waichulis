@@ -16,6 +16,7 @@ export type TExercisePanelParams = {
     onCancel: () => void;
     onClear: () => void;
     onGetHelp: () => void;
+    onWatchDemo?: () => void;
 };
 
 // ============================================================================
@@ -30,6 +31,7 @@ export class ExercisePanel {
     private instructionsEl: HTMLElement | null = null;
     private difficultyEl: HTMLElement | null = null;
     private submitBtn: HTMLButtonElement | null = null;
+    private demoBtn: HTMLButtonElement | null = null;
     private exercise: TExercise | null = null;
     private hasDrawn: boolean = false;
 
@@ -137,8 +139,31 @@ export class ExercisePanel {
                 display: 'flex',
                 gap: '8px',
                 justifyContent: 'flex-end',
+                flexWrap: 'wrap',
             },
         });
+
+        // Demo button (watch demo)
+        this.demoBtn = BB.el({
+            tagName: 'button',
+            css: {
+                padding: '6px 12px',
+                borderRadius: '4px',
+                border: '1px solid var(--kl-color-primary, #2196F3)',
+                backgroundColor: 'transparent',
+                color: 'var(--kl-color-primary, #2196F3)',
+                cursor: 'pointer',
+                fontSize: '12px',
+                display: 'none', // Hidden by default until exercise is set
+            },
+            content: '▶ Demo',
+            onClick: () => {
+                if (this.params.onWatchDemo) {
+                    this.params.onWatchDemo();
+                }
+            },
+        }) as HTMLButtonElement;
+        buttonsRow.appendChild(this.demoBtn);
 
         // Cancel button
         const cancelBtn = BB.el({
@@ -219,6 +244,7 @@ export class ExercisePanel {
             if (this.titleEl) this.titleEl.textContent = '';
             if (this.instructionsEl) this.instructionsEl.textContent = '';
             if (this.difficultyEl) this.difficultyEl.textContent = '';
+            if (this.demoBtn) this.demoBtn.style.display = 'none';
             return;
         }
 
@@ -232,6 +258,13 @@ export class ExercisePanel {
 
         if (this.difficultyEl) {
             this.difficultyEl.textContent = '\u2B50'.repeat(this.exercise.difficulty);
+        }
+
+        // Show demo button for exercises that can have demos (line, dots, shape)
+        if (this.demoBtn) {
+            const hasDemoSupport = this.exercise.config.type !== 'color';
+            const hasCallback = !!this.params.onWatchDemo;
+            this.demoBtn.style.display = hasDemoSupport && hasCallback ? '' : 'none';
         }
     }
 

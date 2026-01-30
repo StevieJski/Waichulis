@@ -15,6 +15,7 @@ import { assessmentOrchestrator } from '../assessment/assessment-orchestrator';
 import { llmClient } from '../api/llm-client';
 import { ExerciseOverlay } from '../tools/exercise-overlay';
 import { ExercisePanel } from './exercise-panel';
+import { DemoPlayer } from './demo-player';
 import { showAssessmentModal } from './assessment-modal';
 import {
     getExerciseById,
@@ -52,6 +53,7 @@ export class ExerciseController {
     private currentExercise: TExercise | null = null;
     private overlay: ExerciseOverlay | null = null;
     private panel: ExercisePanel | null = null;
+    private demoPlayer: DemoPlayer | null = null;
     private attemptNumber: number = 0;
 
     // Stroke tracking
@@ -96,12 +98,23 @@ export class ExerciseController {
         this.params.containerEl.style.position = 'relative';
         this.params.containerEl.appendChild(overlayEl);
 
+        // Create demo player
+        this.demoPlayer = new DemoPlayer({
+            width: canvasWidth,
+            height: canvasHeight,
+            onClose: () => {
+                // Demo closed, resume exercise
+            },
+        });
+        this.params.containerEl.appendChild(this.demoPlayer.getElement());
+
         // Create exercise panel
         this.panel = new ExercisePanel({
             onSubmit: () => this.submitExercise(),
             onCancel: () => this.endExercise(),
             onClear: () => this.clearAttempt(),
             onGetHelp: () => this.showHelp(),
+            onWatchDemo: () => this.showDemo(),
         });
         this.panel.setExercise(exercise);
         this.panel.setVisible(true);
@@ -128,6 +141,12 @@ export class ExerciseController {
         if (this.panel) {
             this.panel.destroy();
             this.panel = null;
+        }
+
+        // Clean up demo player
+        if (this.demoPlayer) {
+            this.demoPlayer.destroy();
+            this.demoPlayer = null;
         }
 
         this.resetStrokeData();
@@ -394,6 +413,11 @@ export class ExerciseController {
         } catch (error) {
             console.error('ExerciseController: Failed to get help', error);
         }
+    }
+
+    private showDemo(): void {
+        if (!this.currentExercise || !this.demoPlayer) return;
+        this.demoPlayer.showDemo(this.currentExercise);
     }
 
     private checkDotHit(x: number, y: number): void {

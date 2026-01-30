@@ -27,6 +27,11 @@ type TExerciseConfigBase = {
 };
 
 /**
+ * Guide line style for exercises
+ */
+export type TLineGuideStyle = 'dashed' | 'dotted' | 'solid';
+
+/**
  * Configuration for line tracing exercises
  */
 export type TLineConfig = TExerciseConfigBase & {
@@ -41,6 +46,10 @@ export type TLineConfig = TExerciseConfigBase & {
     // Starting and ending points
     startPoint: TPoint;
     endPoint: TPoint;
+    // Guide style (defaults to dashed)
+    guideStyle?: TLineGuideStyle;
+    // Whether to show multiple parallel lines
+    multiLine?: boolean;
 };
 
 /**
@@ -56,6 +65,8 @@ export type TDotsConfig = TExerciseConfigBase & {
     dotRadius: number;
     // Optional: resulting shape name for display
     resultingShape?: string;
+    // Optional: SVG background image path for picture exercises
+    backgroundImage?: string;
 };
 
 /**
@@ -162,6 +173,10 @@ export type TExercise = {
     referenceImage?: string;
     // Order within the lesson
     order: number;
+    // Optional demonstration video URL
+    demonstrationVideo?: string;
+    // Optional animation configuration for demo
+    demonstrationAnimation?: TAnimationConfig;
 };
 
 /**
@@ -411,4 +426,48 @@ export type TExerciseOverlayState = {
     exerciseId?: string;
     showGuides: boolean;
     realTimeFeedback: boolean;
+};
+
+// ============================================================================
+// Animation Types
+// ============================================================================
+
+/**
+ * Animation step action types
+ */
+export type TAnimationAction =
+    | 'moveTo'
+    | 'lineTo'
+    | 'curveTo'
+    | 'fill'
+    | 'highlightDot'
+    | 'connectDots'
+    | 'pause';
+
+/**
+ * Single step in an animation sequence
+ */
+export type TAnimationStep = {
+    action: TAnimationAction;
+    params: Record<string, number | string>;
+    duration: number; // ms
+};
+
+/**
+ * Animation configuration for exercise demonstrations
+ */
+export type TAnimationConfig = {
+    type: 'stroke' | 'fill' | 'sequence';
+    steps: TAnimationStep[];
+    duration: number; // total ms
+    loop: boolean;
+};
+
+/**
+ * Demo player state
+ */
+export type TDemoPlayerState = {
+    isPlaying: boolean;
+    currentStep: number;
+    progress: number; // 0-1
 };
