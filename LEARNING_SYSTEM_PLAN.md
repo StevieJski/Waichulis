@@ -4,40 +4,58 @@
 
 Add AI-powered learning capabilities to the Klecks drawing app, enabling users to practice exercises from the Visual Language I curriculum with automated assessment and progress tracking.
 
-**Scope**: Kindergarten curriculum only (DOT, LINE, SHAPE, COLOR units)
+**Scope**: Full K-3 curriculum (DOT, LINE, SHAPE, COLOR units)
 **Assessment**: Hybrid - Local algorithms + Cloud LLM APIs
 **Storage**: IndexedDB (browser-local)
+
+### Current Implementation Status
+
+| Grade | Exercises | Status |
+|-------|-----------|--------|
+| Kindergarten | 63 | ✅ Complete |
+| Grade 1 | 19 | ✅ Complete |
+| Grade 2 | 16 | ✅ Complete |
+| Grade 3 | 19 | ✅ Complete |
+| **Total** | **117** | |
 
 ---
 
 ## Architecture
 
-### New Module Structure
+### Module Structure
 
 ```
 src/app/script/
-  curriculum/                       # NEW learning system
-    types.ts                        # All type definitions
+  curriculum/                       # Learning system module
+    types.ts                        # All type definitions (includes animation types)
+    index.ts                        # Module exports
     data/
-      kindergarten.ts               # Kindergarten curriculum content
+      index.ts                      # Unified curriculum access functions
+      kindergarten.ts               # Kindergarten: 63 exercises
+      grade1.ts                     # Grade 1: 19 exercises
+      grade2.ts                     # Grade 2: 16 exercises
+      grade3.ts                     # Grade 3: 19 exercises
     assessment/
       stroke-analyzer.ts            # Line/stroke accuracy (DTW algorithm)
       shape-analyzer.ts             # Shape recognition & matching
       color-analyzer.ts             # Color distance (Delta-E)
-      llm-feedback.ts               # LLM API integration for feedback
       assessment-orchestrator.ts    # Combines local + LLM assessment
     api/
-      llm-client.ts                 # Multi-provider LLM client
+      llm-client.ts                 # Multi-provider LLM client (Google, Anthropic, OpenAI)
       api-config.ts                 # API keys and model settings
       prompt-templates.ts           # Feedback prompt templates
     storage/
       progress-store.ts             # IndexedDB wrapper for progress
+    animations/                     # NEW: Demo animation system
+      index.ts                      # Animation exports
+      stroke-animator.ts            # SVG stroke animation engine
     ui/
-      learn-tab-ui.ts               # Main Learn tab (like file-ui.ts)
-      curriculum-browser.ts         # Lesson/exercise browser
-      exercise-panel.ts             # Exercise instructions overlay
+      learn-ui.ts                   # Main Learn tab UI
+      exercise-panel.ts             # Exercise instructions + Demo button
+      exercise-controller.ts        # Exercise flow orchestration
       assessment-modal.ts           # Results modal with feedback
       settings-panel.ts             # API key configuration
+      demo-player.ts                # NEW: Animation demonstration player
     tools/
       easel-exercise.ts             # TEaselTool for exercise mode
       exercise-overlay.ts           # SVG guides/targets overlay
@@ -382,24 +400,52 @@ class AssessmentOrchestrator {
 
 ---
 
-## Exercise Content (Kindergarten)
+## Exercise Content (Kindergarten) - 63 Exercises
 
-Derived from Visual Language Kindergarten PDF (pages 3-55):
+Derived from Visual Language Kindergarten PDF, fully replicated:
 
-**Unit: DOT/LINE** (~12 exercises)
-- First marks: dot, line introduction
-- Line tracing: straight, curved, wavy, zigzag, broken, spiral
-- Connect-the-dots: letters A-J, numbers 1-10, colors, objects
+**Unit: DOT/LINE** (37 exercises)
 
-**Unit: SHAPE** (~8 exercises)
-- Shape introduction: triangle, square, diamond, rectangle, circle, oval
-- Shape tracing with guides
-- Shape drawing practice
+*Lesson 1: Line Tracing (17 exercises)*
+- Straight lines: horizontal, vertical, diagonal (3)
+- Curved lines: large arc, small arcs, circle arcs (3)
+- Wavy lines: simple, tall, complex (3)
+- Zigzag lines: mountain, varied heights, horizontal (3)
+- Broken lines: horizontal, vertical, diagonal (3)
+- Spiral lines: small, large (2)
 
-**Unit: COLOR** (~6 exercises)
-- Color wheel (6 colors: red, orange, yellow, green, blue, purple)
-- Rainbow coloring
-- Fruit coloring (apple=red, orange=orange, banana/pear=yellow/green, blueberries=blue, grapes=purple)
+*Lesson 2: Match the Letters (4 exercises)*
+- Match letters A-E, F-J
+- Match numbers 1-5
+- Match colors
+
+*Lesson 3: Count and Match (4 exercises)*
+- Count and match dots, acorns, apples, bananas
+
+*Lesson 4: Connect-the-Dots Pictures (12 exercises)*
+- Simple: flower, snowman, house (A-E dots)
+- Medium: boy, train, fish (A-H dots)
+- Advanced: airplane, kite, tulip, dog, duck, owl (1-10 numbered)
+
+**Unit: SHAPE** (12 exercises)
+
+*Lesson 1: Basic Shapes Introduction (6 exercises)*
+- Connect-the-dots style: triangle, square, diamond, rectangle, circle, oval
+
+*Lesson 2: Shape Practice (6 exercises)*
+- Tracing guides: triangle, square, diamond, rectangle, circle, oval
+
+**Unit: COLOR** (14 exercises)
+
+*Lesson 1: Color Basics (2 exercises)*
+- Color wheel (6 sections)
+- Rainbow bands
+
+*Lesson 2: Coloring Fruits (6 exercises)*
+- Apple (red), orange (orange), banana (yellow), pear (green), blueberries (blue), grapes (purple)
+
+*Lesson 3: Trace and Color (6 exercises)*
+- Tree, ice cream, house, star/moon, flower, truck
 
 ---
 
@@ -463,10 +509,56 @@ Assuming:
 
 ---
 
+## Animation/Demo System
+
+Each exercise can include an animated demonstration showing how to complete it.
+
+### Components
+
+**StrokeAnimator** (`animations/stroke-animator.ts`)
+- SVG-based animation engine
+- Animates strokes along paths for line exercises
+- Animates dot highlighting and connection sequences
+- Supports play/pause/stop/loop controls
+- Bezier curve interpolation for smooth animations
+
+**DemoPlayer** (`ui/demo-player.ts`)
+- UI overlay for watching demonstrations
+- "Watch Demo" button in exercise panel
+- Auto-generates animations from exercise configs
+- Play/Pause/Restart/Close controls with progress bar
+
+### Animation Types
+
+```typescript
+type TAnimationConfig = {
+  type: 'stroke' | 'fill' | 'sequence';
+  steps: TAnimationStep[];
+  duration: number;  // total ms
+  loop: boolean;
+};
+
+type TAnimationStep = {
+  action: 'moveTo' | 'lineTo' | 'curveTo' | 'highlightDot' | 'connectDots' | 'fill' | 'pause';
+  params: Record<string, number | string>;
+  duration: number;  // ms
+};
+```
+
+### Usage
+
+Exercises can define `demonstrationAnimation` in their config, or animations are auto-generated from:
+- Line exercises: Generated from `targetPath` SVG data
+- Dots exercises: Generated from dots array with highlight + connect sequence
+- Shape exercises: Generated from corners/center with stroke animation
+
+---
+
 ## Notes
 
-- Exercise content will be programmatically defined (SVG paths, coordinates) based on PDF worksheets
-- The "cut and assemble" exercises from PDFs are not applicable digitally and will be skipped
+- Exercise content programmatically defined (SVG paths, coordinates) based on PDF worksheets
+- The "cut and assemble" exercises from PDFs are not applicable digitally and are skipped
 - API keys stored client-side (user provides their own key)
 - Graceful degradation: works fully offline with local algorithms + template feedback
-- Future expansion: grades 1-3, cloud sync, teacher dashboard, learning analytics
+- Grades 1-3 curricula are implemented with 19, 16, and 19 exercises respectively
+- Future expansion: cloud sync, teacher dashboard, learning analytics
