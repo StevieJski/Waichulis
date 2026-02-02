@@ -1917,8 +1917,134 @@ export class KlApp {
         let currentExercise: TExercise | null = null;
         let exerciseOverlay: ExerciseOverlay | null = null;
         let exercisePanel: ExercisePanel | null = null;
+        let exerciseBackgroundUrl: string | null = null;
+        let exerciseBackgroundImage: HTMLImageElement | null = null;
+        let exerciseBackgroundRotation: number = 0;
+        let exerciseBackgroundRequestId = 0;
+
+        const renderExerciseBackground = (mode: 'reset' | 'behind') => {
+            const baseLayer = this.klCanvas.getLayer(0);
+            const ctx = baseLayer.context;
+            const width = baseLayer.canvas.width;
+            const height = baseLayer.canvas.height;
+
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+            if (mode === 'reset') {
+                ctx.clearRect(0, 0, width, height);
+            }
+
+            if (!exerciseBackgroundUrl) {
+                if (mode === 'behind') {
+                    ctx.globalCompositeOperation = 'destination-over';
+                }
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, width, height);
+                ctx.restore();
+                this.easelProjectUpdater.update();
+                this.easel.requestRender();
+                return;
+            }
+
+            if (!exerciseBackgroundImage) {
+                ctx.restore();
+                this.easelProjectUpdater.update();
+                this.easel.requestRender();
+                return;
+            }
+
+            if (mode === 'behind') {
+                ctx.globalCompositeOperation = 'destination-over';
+            } else {
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, width, height);
+            }
+
+            const rotation = exerciseBackgroundRotation % 360;
+            const naturalWidth = exerciseBackgroundImage.naturalWidth;
+            const naturalHeight = exerciseBackgroundImage.naturalHeight;
+            const rotatedWidth = rotation === 90 || rotation === 270 ? naturalHeight : naturalWidth;
+            const rotatedHeight = rotation === 90 || rotation === 270 ? naturalWidth : naturalHeight;
+            const scale = Math.min(width / rotatedWidth, height / rotatedHeight);
+            const drawWidth = rotatedWidth * scale;
+            const drawHeight = rotatedHeight * scale;
+            const offsetX = (width - drawWidth) / 2;
+            const offsetY = (height - drawHeight) / 2;
+
+            ctx.translate(offsetX, offsetY);
+
+            if (rotation === 90) {
+                ctx.translate(drawWidth, 0);
+                ctx.rotate(Math.PI / 2);
+                ctx.drawImage(exerciseBackgroundImage, 0, 0, drawHeight, drawWidth);
+            } else if (rotation === 180) {
+                ctx.translate(drawWidth, drawHeight);
+                ctx.rotate(Math.PI);
+                ctx.drawImage(exerciseBackgroundImage, 0, 0, drawWidth, drawHeight);
+            } else if (rotation === 270) {
+                ctx.translate(0, drawHeight);
+                ctx.rotate(-Math.PI / 2);
+                ctx.drawImage(exerciseBackgroundImage, 0, 0, drawHeight, drawWidth);
+            } else {
+                ctx.drawImage(exerciseBackgroundImage, 0, 0, drawWidth, drawHeight);
+            }
+
+            if (mode === 'behind') {
+                ctx.save();
+                ctx.setTransform(1, 0, 0, 1, 0, 0);
+                ctx.globalCompositeOperation = 'destination-over';
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, width, height);
+                ctx.restore();
+            }
+
+            ctx.restore();
+            this.easelProjectUpdater.update();
+            this.easel.requestRender();
+        };
+
+        const loadExerciseBackground = (exercise: TExercise) => {
+            const url = exercise.config.backgroundImage ?? null;
+            exerciseBackgroundUrl = url;
+            exerciseBackgroundImage = null;
+            exerciseBackgroundRotation = 0;
+            exerciseBackgroundRequestId += 1;
+            const requestId = exerciseBackgroundRequestId;
+            const rotationOverride = exercise.config.backgroundRotation;
+
+            if (!url) {
+                renderExerciseBackground('reset');
+                return;
+            }
+
+            const image = new Image();
+            image.onload = () => {
+                if (exerciseBackgroundRequestId !== requestId) {
+                    return;
+                }
+                exerciseBackgroundImage = image;
+                if (rotationOverride !== undefined) {
+                    exerciseBackgroundRotation = rotationOverride;
+                } else {
+                    exerciseBackgroundRotation = image.naturalWidth > image.naturalHeight ? 90 : 0;
+                }
+                renderExerciseBackground('behind');
+            };
+            image.onerror = () => {
+                if (exerciseBackgroundRequestId !== requestId) {
+                    return;
+                }
+                exerciseBackgroundUrl = null;
+                exerciseBackgroundImage = null;
+                exerciseBackgroundRotation = 0;
+                renderExerciseBackground('behind');
+            };
+            image.src = url;
+        };
 
         const endExerciseMode = () => {
+            const hadBackground = !!exerciseBackgroundUrl;
             if (exerciseOverlay) {
                 exerciseOverlay.destroy();
                 exerciseOverlay = null;
@@ -1933,6 +2059,13 @@ export class KlApp {
             // Reset stroke data
             exerciseStrokeData = { strokes: [], startTime: 0, endTime: 0 };
             currentExerciseStroke = [];
+            if (hadBackground) {
+                exerciseBackgroundUrl = null;
+                exerciseBackgroundImage = null;
+                exerciseBackgroundRotation = 0;
+                exerciseBackgroundRequestId += 1;
+                renderExerciseBackground('reset');
+            }
         };
 
         // Helper to clear just the user's drawing (not background)
@@ -1942,7 +2075,6 @@ export class KlApp {
             console.log('layer count:', layerCount);
 
             // Use klCanvas.eraseLayer() to properly update history
-            // Then refill base layer with white
             for (let i = 0; i < layerCount; i++) {
                 console.log(`Clearing layer ${i}`);
                 this.klCanvas.eraseLayer({
@@ -1952,20 +2084,7 @@ export class KlApp {
                 });
             }
 
-            // Refill base layer (index 0) with white background
-            const baseLayer = this.klCanvas.getLayer(0);
-            const ctx = baseLayer.context;
-            ctx.save();
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, baseLayer.canvas.width, baseLayer.canvas.height);
-            ctx.restore();
-            console.log('Filled base layer with white');
-
-            // Force render update
-            this.easelProjectUpdater.update();
-            this.easel.requestRender();
-            console.log('render update done');
+            renderExerciseBackground('reset');
 
             // Reset stroke data
             exerciseStrokeData = { strokes: [], startTime: 0, endTime: 0 };
@@ -2009,6 +2128,8 @@ export class KlApp {
             // End any existing exercise
             endExerciseMode();
 
+            loadExerciseBackground(exercise);
+
             // Clear user's drawing layer (keep background intact)
             clearUserDrawing();
 
@@ -2020,7 +2141,9 @@ export class KlApp {
             // Create overlay with exercise dimensions (or canvas dimensions)
             const canvasWidth = exercise.config.canvasWidth || 800;
             const canvasHeight = exercise.config.canvasHeight || 600;
-            exerciseOverlay = new ExerciseOverlay(canvasWidth, canvasHeight);
+            exerciseOverlay = new ExerciseOverlay(canvasWidth, canvasHeight, undefined, {
+                renderBackground: false,
+            });
             exerciseOverlay.setExercise(exercise);
 
             // Position overlay over the easel

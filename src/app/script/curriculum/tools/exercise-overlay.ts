@@ -54,12 +54,20 @@ export class ExerciseOverlay {
     private svgEl: SVGSVGElement;
     private guideGroup: SVGGElement;
     private feedbackGroup: SVGGElement;
+    private backgroundEl: SVGImageElement | null = null;
     private exercise: TExercise | null = null;
     private hitDots: Set<string> = new Set();
     private colors: TOverlayColors;
+    private renderBackground: boolean;
 
-    constructor(width: number, height: number, colors?: Partial<TOverlayColors>) {
+    constructor(
+        width: number,
+        height: number,
+        colors?: Partial<TOverlayColors>,
+        options?: { renderBackground?: boolean }
+    ) {
         this.colors = { ...DEFAULT_COLORS, ...colors };
+        this.renderBackground = options?.renderBackground !== false;
 
         // Create root SVG element
         this.svgEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -90,6 +98,10 @@ export class ExerciseOverlay {
         this.svgEl.setAttribute('width', String(width));
         this.svgEl.setAttribute('height', String(height));
         this.svgEl.setAttribute('viewBox', `0 0 ${width} ${height}`);
+        if (this.backgroundEl) {
+            this.backgroundEl.setAttribute('width', String(width));
+            this.backgroundEl.setAttribute('height', String(height));
+        }
     }
 
     /**
@@ -109,6 +121,10 @@ export class ExerciseOverlay {
         this.hitDots.clear();
         this.clearGuides();
         this.clearFeedback();
+        this.renderBackground();
+        if (exercise.config.showGuides === false) {
+            return;
+        }
         this.renderGuides();
     }
 
@@ -166,6 +182,25 @@ export class ExerciseOverlay {
         while (this.guideGroup.firstChild) {
             this.guideGroup.removeChild(this.guideGroup.firstChild);
         }
+        this.backgroundEl = null;
+    }
+
+    private renderBackground(): void {
+        if (!this.renderBackground) return;
+        if (!this.exercise) return;
+        const config = this.exercise.config;
+        if (!config.backgroundImage) return;
+
+        const image = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+        image.setAttribute('x', '0');
+        image.setAttribute('y', '0');
+        image.setAttribute('width', this.svgEl.getAttribute('width') || '0');
+        image.setAttribute('height', this.svgEl.getAttribute('height') || '0');
+        image.setAttribute('preserveAspectRatio', 'none');
+        image.setAttribute('href', config.backgroundImage);
+        image.setAttributeNS('http://www.w3.org/1999/xlink', 'href', config.backgroundImage);
+        this.guideGroup.appendChild(image);
+        this.backgroundEl = image;
     }
 
     private renderGuides(): void {

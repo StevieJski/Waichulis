@@ -24,6 +24,9 @@ type TExerciseConfigBase = {
     canvasWidth: number;
     canvasHeight: number;
     backgroundColor?: string; // CSS color, defaults to white
+    backgroundImage?: string; // URL for curriculum background image
+    backgroundRotation?: 0 | 90 | 180 | 270; // override rotation for background image
+    showGuides?: boolean; // render overlay guides (default true)
 };
 
 /**

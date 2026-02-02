@@ -26,8 +26,8 @@ import {
 // Canvas Constants
 // ============================================================================
 
-const CANVAS_WIDTH = 600;
-const CANVAS_HEIGHT = 400;
+const CANVAS_WIDTH = 612;
+const CANVAS_HEIGHT = 792;
 const GUIDE_STROKE_WIDTH = 3;
 const DEFAULT_DOT_RADIUS = 15;
 
@@ -47,6 +47,54 @@ const COLORS = {
     brown: { r: 139, g: 69, b: 19 },
     pink: { r: 255, g: 192, b: 203 },
 };
+
+// ============================================================================
+// Curriculum Image Assets (PDF page backgrounds)
+// ============================================================================
+
+const K_PAGE_14 = new URL('../../../img/curriculum/kindergarten/page-14.png', import.meta.url).toString();
+const K_PAGE_15 = new URL('../../../img/curriculum/kindergarten/page-15.png', import.meta.url).toString();
+const K_PAGE_16 = new URL('../../../img/curriculum/kindergarten/page-16.png', import.meta.url).toString();
+const K_PAGE_17 = new URL('../../../img/curriculum/kindergarten/page-17.png', import.meta.url).toString();
+const K_PAGE_18 = new URL('../../../img/curriculum/kindergarten/page-18.png', import.meta.url).toString();
+const K_PAGE_19 = new URL('../../../img/curriculum/kindergarten/page-19.png', import.meta.url).toString();
+const K_PAGE_20 = new URL('../../../img/curriculum/kindergarten/page-20.png', import.meta.url).toString();
+const K_PAGE_21 = new URL('../../../img/curriculum/kindergarten/page-21.png', import.meta.url).toString();
+const K_PAGE_22 = new URL('../../../img/curriculum/kindergarten/page-22.png', import.meta.url).toString();
+const K_PAGE_23 = new URL('../../../img/curriculum/kindergarten/page-23.png', import.meta.url).toString();
+const K_PAGE_24 = new URL('../../../img/curriculum/kindergarten/page-24.png', import.meta.url).toString();
+const K_PAGE_25 = new URL('../../../img/curriculum/kindergarten/page-25.png', import.meta.url).toString();
+const K_PAGE_26 = new URL('../../../img/curriculum/kindergarten/page-26.png', import.meta.url).toString();
+const K_PAGE_27 = new URL('../../../img/curriculum/kindergarten/page-27.png', import.meta.url).toString();
+const K_PAGE_29 = new URL('../../../img/curriculum/kindergarten/page-29.png', import.meta.url).toString();
+const K_PAGE_30 = new URL('../../../img/curriculum/kindergarten/page-30.png', import.meta.url).toString();
+const K_PAGE_31 = new URL('../../../img/curriculum/kindergarten/page-31.png', import.meta.url).toString();
+const K_PAGE_32 = new URL('../../../img/curriculum/kindergarten/page-32.png', import.meta.url).toString();
+const K_PAGE_33 = new URL('../../../img/curriculum/kindergarten/page-33.png', import.meta.url).toString();
+const K_PAGE_34 = new URL('../../../img/curriculum/kindergarten/page-34.png', import.meta.url).toString();
+const K_PAGE_35 = new URL('../../../img/curriculum/kindergarten/page-35.png', import.meta.url).toString();
+const K_PAGE_36 = new URL('../../../img/curriculum/kindergarten/page-36.png', import.meta.url).toString();
+const K_PAGE_37 = new URL('../../../img/curriculum/kindergarten/page-37.png', import.meta.url).toString();
+const K_PAGE_38 = new URL('../../../img/curriculum/kindergarten/page-38.png', import.meta.url).toString();
+const K_PAGE_39 = new URL('../../../img/curriculum/kindergarten/page-39.png', import.meta.url).toString();
+const K_PAGE_40 = new URL('../../../img/curriculum/kindergarten/page-40.png', import.meta.url).toString();
+const K_PAGE_42 = new URL('../../../img/curriculum/kindergarten/page-42.png', import.meta.url).toString();
+const K_PAGE_43 = new URL('../../../img/curriculum/kindergarten/page-43.png', import.meta.url).toString();
+const K_PAGE_44 = new URL('../../../img/curriculum/kindergarten/page-44.png', import.meta.url).toString();
+const K_PAGE_45 = new URL('../../../img/curriculum/kindergarten/page-45.png', import.meta.url).toString();
+const K_PAGE_46 = new URL('../../../img/curriculum/kindergarten/page-46.png', import.meta.url).toString();
+const K_PAGE_47 = new URL('../../../img/curriculum/kindergarten/page-47.png', import.meta.url).toString();
+const K_PAGE_50 = new URL('../../../img/curriculum/kindergarten/page-50.png', import.meta.url).toString();
+const K_PAGE_52 = new URL('../../../img/curriculum/kindergarten/page-52.png', import.meta.url).toString();
+const K_PAGE_53 = new URL('../../../img/curriculum/kindergarten/page-53.png', import.meta.url).toString();
+const K_PAGE_54 = new URL('../../../img/curriculum/kindergarten/page-54.png', import.meta.url).toString();
+const K_PAGE_55 = new URL('../../../img/curriculum/kindergarten/page-55.png', import.meta.url).toString();
+const K_PAGE_56 = new URL('../../../img/curriculum/kindergarten/page-56.png', import.meta.url).toString();
+const K_PAGE_57 = new URL('../../../img/curriculum/kindergarten/page-57.png', import.meta.url).toString();
+const K_PAGE_58 = new URL('../../../img/curriculum/kindergarten/page-58.png', import.meta.url).toString();
+const K_PAGE_59 = new URL('../../../img/curriculum/kindergarten/page-59.png', import.meta.url).toString();
+const K_PAGE_60 = new URL('../../../img/curriculum/kindergarten/page-60.png', import.meta.url).toString();
+const K_PAGE_61 = new URL('../../../img/curriculum/kindergarten/page-61.png', import.meta.url).toString();
 
 // ============================================================================
 // Animation Helper Functions
@@ -128,6 +176,8 @@ const straightLineHorizontal: TExercise = {
         canvasHeight: CANVAS_HEIGHT,
         targetPath: 'M 50 120 L 550 120 M 50 200 L 550 200 M 50 280 L 550 280',
         guideStrokeWidth: GUIDE_STROKE_WIDTH,
+        backgroundImage: K_PAGE_14,
+        showGuides: false,
         tolerance: 20,
         startPoint: { x: 50, y: 120 },
         endPoint: { x: 550, y: 280 },
@@ -158,6 +208,8 @@ const straightLineVertical: TExercise = {
         canvasHeight: CANVAS_HEIGHT,
         targetPath: 'M 150 50 L 150 350 M 300 50 L 300 350 M 450 50 L 450 350',
         guideStrokeWidth: GUIDE_STROKE_WIDTH,
+        backgroundImage: K_PAGE_14,
+        showGuides: false,
         tolerance: 20,
         startPoint: { x: 150, y: 50 },
         endPoint: { x: 450, y: 350 },
@@ -188,6 +240,8 @@ const straightLineDiagonal: TExercise = {
         canvasHeight: CANVAS_HEIGHT,
         targetPath: 'M 50 50 L 275 350 M 325 50 L 550 350 M 550 50 L 325 350 M 275 50 L 50 350',
         guideStrokeWidth: GUIDE_STROKE_WIDTH,
+        backgroundImage: K_PAGE_14,
+        showGuides: false,
         tolerance: 25,
         startPoint: { x: 50, y: 50 },
         endPoint: { x: 550, y: 350 },
@@ -220,6 +274,8 @@ const curvedLineLargeArc: TExercise = {
         canvasHeight: CANVAS_HEIGHT,
         targetPath: 'M 100 300 Q 300 50 500 300',
         guideStrokeWidth: GUIDE_STROKE_WIDTH,
+        backgroundImage: K_PAGE_15,
+        showGuides: false,
         tolerance: 25,
         startPoint: { x: 100, y: 300 },
         endPoint: { x: 500, y: 300 },
@@ -249,6 +305,8 @@ const curvedLineSmallArcs: TExercise = {
         canvasHeight: CANVAS_HEIGHT,
         targetPath: 'M 50 250 Q 100 150 150 250 Q 200 150 250 250 Q 300 150 350 250 Q 400 150 450 250 Q 500 150 550 250',
         guideStrokeWidth: GUIDE_STROKE_WIDTH,
+        backgroundImage: K_PAGE_15,
+        showGuides: false,
         tolerance: 25,
         startPoint: { x: 50, y: 250 },
         endPoint: { x: 550, y: 250 },
@@ -278,6 +336,8 @@ const curvedLineCircleArcs: TExercise = {
         canvasHeight: CANVAS_HEIGHT,
         targetPath: 'M 100 200 A 100 100 0 0 1 300 200 M 300 200 A 100 100 0 0 1 500 200',
         guideStrokeWidth: GUIDE_STROKE_WIDTH,
+        backgroundImage: K_PAGE_15,
+        showGuides: false,
         tolerance: 30,
         startPoint: { x: 100, y: 200 },
         endPoint: { x: 500, y: 200 },
@@ -309,6 +369,8 @@ const wavyLineSimple: TExercise = {
         canvasHeight: CANVAS_HEIGHT,
         targetPath: 'M 50 200 Q 125 150 200 200 Q 275 250 350 200 Q 425 150 500 200 Q 575 250 550 200',
         guideStrokeWidth: GUIDE_STROKE_WIDTH,
+        backgroundImage: K_PAGE_16,
+        showGuides: false,
         tolerance: 30,
         startPoint: { x: 50, y: 200 },
         endPoint: { x: 550, y: 200 },
@@ -338,6 +400,8 @@ const wavyLineTall: TExercise = {
         canvasHeight: CANVAS_HEIGHT,
         targetPath: 'M 50 200 Q 100 50 175 200 Q 250 350 325 200 Q 400 50 475 200 Q 550 350 550 200',
         guideStrokeWidth: GUIDE_STROKE_WIDTH,
+        backgroundImage: K_PAGE_16,
+        showGuides: false,
         tolerance: 35,
         startPoint: { x: 50, y: 200 },
         endPoint: { x: 550, y: 200 },
@@ -367,6 +431,8 @@ const wavyLineComplex: TExercise = {
         canvasHeight: CANVAS_HEIGHT,
         targetPath: 'M 50 200 Q 75 150 100 200 Q 150 280 200 200 Q 225 160 250 200 Q 325 300 400 200 Q 450 130 500 200 Q 525 230 550 200',
         guideStrokeWidth: GUIDE_STROKE_WIDTH,
+        backgroundImage: K_PAGE_16,
+        showGuides: false,
         tolerance: 35,
         startPoint: { x: 50, y: 200 },
         endPoint: { x: 550, y: 200 },
@@ -398,6 +464,8 @@ const zigzagLineMountain: TExercise = {
         canvasHeight: CANVAS_HEIGHT,
         targetPath: 'M 50 300 L 150 100 L 250 300 L 350 100 L 450 300 L 550 100',
         guideStrokeWidth: GUIDE_STROKE_WIDTH,
+        backgroundImage: K_PAGE_17,
+        showGuides: false,
         tolerance: 25,
         startPoint: { x: 50, y: 300 },
         endPoint: { x: 550, y: 100 },
@@ -427,6 +495,8 @@ const zigzagLineVaried: TExercise = {
         canvasHeight: CANVAS_HEIGHT,
         targetPath: 'M 50 250 L 100 100 L 175 250 L 250 150 L 325 250 L 400 50 L 475 250 L 550 180',
         guideStrokeWidth: GUIDE_STROKE_WIDTH,
+        backgroundImage: K_PAGE_17,
+        showGuides: false,
         tolerance: 30,
         startPoint: { x: 50, y: 250 },
         endPoint: { x: 550, y: 180 },
@@ -456,6 +526,8 @@ const zigzagLineHorizontal: TExercise = {
         canvasHeight: CANVAS_HEIGHT,
         targetPath: 'M 50 200 L 100 150 L 150 250 L 200 150 L 250 250 L 300 150 L 350 250 L 400 150 L 450 250 L 500 150 L 550 200',
         guideStrokeWidth: GUIDE_STROKE_WIDTH,
+        backgroundImage: K_PAGE_17,
+        showGuides: false,
         tolerance: 25,
         startPoint: { x: 50, y: 200 },
         endPoint: { x: 550, y: 200 },
@@ -487,6 +559,8 @@ const brokenLineHorizontal: TExercise = {
         canvasHeight: CANVAS_HEIGHT,
         targetPath: 'M 50 200 L 100 200 M 130 200 L 180 200 M 210 200 L 260 200 M 290 200 L 340 200 M 370 200 L 420 200 M 450 200 L 500 200',
         guideStrokeWidth: GUIDE_STROKE_WIDTH,
+        backgroundImage: K_PAGE_18,
+        showGuides: false,
         tolerance: 20,
         startPoint: { x: 50, y: 200 },
         endPoint: { x: 500, y: 200 },
@@ -516,6 +590,8 @@ const brokenLineVertical: TExercise = {
         canvasHeight: CANVAS_HEIGHT,
         targetPath: 'M 200 50 L 200 100 M 200 130 L 200 180 M 200 210 L 200 260 M 200 290 L 200 340 M 400 50 L 400 100 M 400 130 L 400 180 M 400 210 L 400 260 M 400 290 L 400 340',
         guideStrokeWidth: GUIDE_STROKE_WIDTH,
+        backgroundImage: K_PAGE_18,
+        showGuides: false,
         tolerance: 20,
         startPoint: { x: 200, y: 50 },
         endPoint: { x: 400, y: 340 },
@@ -546,6 +622,8 @@ const brokenLineDiagonal: TExercise = {
         canvasHeight: CANVAS_HEIGHT,
         targetPath: 'M 50 50 L 100 100 M 130 130 L 180 180 M 210 210 L 260 260 M 290 290 L 340 340 M 450 50 L 400 100 M 370 130 L 320 180 M 290 210 L 240 260 M 210 290 L 160 340',
         guideStrokeWidth: GUIDE_STROKE_WIDTH,
+        backgroundImage: K_PAGE_18,
+        showGuides: false,
         tolerance: 25,
         startPoint: { x: 50, y: 50 },
         endPoint: { x: 340, y: 340 },
@@ -577,6 +655,8 @@ const spiralLineSmall: TExercise = {
         canvasHeight: CANVAS_HEIGHT,
         targetPath: 'M 300 200 C 300 185 315 170 330 170 C 360 170 380 200 380 230 C 380 275 340 305 290 305 C 225 305 185 255 185 190',
         guideStrokeWidth: GUIDE_STROKE_WIDTH,
+        backgroundImage: K_PAGE_19,
+        showGuides: false,
         tolerance: 35,
         startPoint: { x: 300, y: 200 },
         endPoint: { x: 185, y: 190 },
@@ -606,6 +686,8 @@ const spiralLineLarge: TExercise = {
         canvasHeight: CANVAS_HEIGHT,
         targetPath: 'M 300 200 C 300 180 320 160 340 160 C 380 160 400 200 400 240 C 400 300 340 340 280 340 C 200 340 160 280 160 200 C 160 100 240 60 340 60 C 460 60 520 160 520 280',
         guideStrokeWidth: GUIDE_STROKE_WIDTH,
+        backgroundImage: K_PAGE_19,
+        showGuides: false,
         tolerance: 40,
         startPoint: { x: 300, y: 200 },
         endPoint: { x: 520, y: 280 },
@@ -650,6 +732,8 @@ const connectDotsMatchAE: TExercise = {
         ],
         requireOrder: false,
         dotRadius: 20,
+        backgroundImage: K_PAGE_20,
+        showGuides: false,
         resultingShape: 'matching letters',
     } as TDotsConfig,
     passingScore: 80,
@@ -686,6 +770,8 @@ const connectDotsMatchFJ: TExercise = {
         ],
         requireOrder: false,
         dotRadius: 20,
+        backgroundImage: K_PAGE_21,
+        showGuides: false,
         resultingShape: 'matching letters',
     } as TDotsConfig,
     passingScore: 80,
@@ -722,6 +808,8 @@ const connectDotsMatch15: TExercise = {
         ],
         requireOrder: false,
         dotRadius: 20,
+        backgroundImage: K_PAGE_22,
+        showGuides: false,
         resultingShape: 'matching numbers',
     } as TDotsConfig,
     passingScore: 80,
@@ -756,6 +844,8 @@ const connectDotsMatchColors: TExercise = {
         ],
         requireOrder: false,
         dotRadius: 22,
+        backgroundImage: K_PAGE_23,
+        showGuides: false,
         resultingShape: 'matching colors',
     } as TDotsConfig,
     passingScore: 80,
@@ -792,6 +882,8 @@ const dotsCountMatch1: TExercise = {
         ],
         requireOrder: false,
         dotRadius: 25,
+        backgroundImage: K_PAGE_24,
+        showGuides: false,
         resultingShape: 'number matching',
     } as TDotsConfig,
     passingScore: 80,
@@ -824,6 +916,8 @@ const dotsCountMatch2: TExercise = {
         ],
         requireOrder: false,
         dotRadius: 25,
+        backgroundImage: K_PAGE_25,
+        showGuides: false,
         resultingShape: 'counting acorns',
     } as TDotsConfig,
     passingScore: 80,
@@ -856,6 +950,8 @@ const dotsCountMatch3: TExercise = {
         ],
         requireOrder: false,
         dotRadius: 25,
+        backgroundImage: K_PAGE_26,
+        showGuides: false,
         resultingShape: 'counting apples',
     } as TDotsConfig,
     passingScore: 80,
@@ -888,6 +984,8 @@ const dotsCountMatch4: TExercise = {
         ],
         requireOrder: false,
         dotRadius: 25,
+        backgroundImage: K_PAGE_27,
+        showGuides: false,
         resultingShape: 'counting bananas',
     } as TDotsConfig,
     passingScore: 80,
@@ -921,6 +1019,8 @@ const dotsFlower: TExercise = {
         ],
         requireOrder: true,
         dotRadius: DEFAULT_DOT_RADIUS,
+        backgroundImage: K_PAGE_29,
+        showGuides: false,
         resultingShape: 'flower stem',
         backgroundImage: 'flower-petals.svg',
     } as TDotsConfig,
@@ -952,6 +1052,8 @@ const dotsSnowman: TExercise = {
         ],
         requireOrder: true,
         dotRadius: DEFAULT_DOT_RADIUS,
+        backgroundImage: K_PAGE_30,
+        showGuides: false,
         resultingShape: 'snowman',
     } as TDotsConfig,
     passingScore: 70,
@@ -983,6 +1085,8 @@ const dotsHouse: TExercise = {
         ],
         requireOrder: true,
         dotRadius: DEFAULT_DOT_RADIUS,
+        backgroundImage: K_PAGE_31,
+        showGuides: false,
         resultingShape: 'house',
     } as TDotsConfig,
     passingScore: 70,
@@ -1016,6 +1120,8 @@ const dotsBoy: TExercise = {
         ],
         requireOrder: true,
         dotRadius: DEFAULT_DOT_RADIUS,
+        backgroundImage: K_PAGE_32,
+        showGuides: false,
         resultingShape: 'boy figure',
     } as TDotsConfig,
     passingScore: 70,
@@ -1048,6 +1154,8 @@ const dotsTrain: TExercise = {
         ],
         requireOrder: true,
         dotRadius: DEFAULT_DOT_RADIUS,
+        backgroundImage: K_PAGE_33,
+        showGuides: false,
         resultingShape: 'train',
     } as TDotsConfig,
     passingScore: 70,
@@ -1082,6 +1190,8 @@ const dotsFish: TExercise = {
         ],
         requireOrder: true,
         dotRadius: DEFAULT_DOT_RADIUS,
+        backgroundImage: K_PAGE_34,
+        showGuides: false,
         resultingShape: 'fish',
     } as TDotsConfig,
     passingScore: 70,
@@ -1118,6 +1228,8 @@ const dotsAirplane: TExercise = {
         ],
         requireOrder: true,
         dotRadius: DEFAULT_DOT_RADIUS,
+        backgroundImage: K_PAGE_35,
+        showGuides: false,
         resultingShape: 'airplane',
     } as TDotsConfig,
     passingScore: 70,
@@ -1154,6 +1266,8 @@ const dotsKite: TExercise = {
         ],
         requireOrder: true,
         dotRadius: DEFAULT_DOT_RADIUS,
+        backgroundImage: K_PAGE_36,
+        showGuides: false,
         resultingShape: 'kite with tail',
     } as TDotsConfig,
     passingScore: 70,
@@ -1190,6 +1304,8 @@ const dotsTulip: TExercise = {
         ],
         requireOrder: true,
         dotRadius: DEFAULT_DOT_RADIUS,
+        backgroundImage: K_PAGE_37,
+        showGuides: false,
         resultingShape: 'tulip flower',
     } as TDotsConfig,
     passingScore: 70,
@@ -1226,6 +1342,8 @@ const dotsDog: TExercise = {
         ],
         requireOrder: true,
         dotRadius: DEFAULT_DOT_RADIUS,
+        backgroundImage: K_PAGE_38,
+        showGuides: false,
         resultingShape: 'dog',
     } as TDotsConfig,
     passingScore: 70,
@@ -1261,6 +1379,8 @@ const dotsDuck: TExercise = {
         ],
         requireOrder: true,
         dotRadius: DEFAULT_DOT_RADIUS,
+        backgroundImage: K_PAGE_39,
+        showGuides: false,
         resultingShape: 'duck',
     } as TDotsConfig,
     passingScore: 70,
@@ -1297,6 +1417,8 @@ const dotsOwl: TExercise = {
         ],
         requireOrder: true,
         dotRadius: DEFAULT_DOT_RADIUS,
+        backgroundImage: K_PAGE_40,
+        showGuides: false,
         resultingShape: 'owl',
     } as TDotsConfig,
     passingScore: 70,
@@ -1323,6 +1445,8 @@ const shapeTriangleIntro: TExercise = {
         type: 'dots',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_42,
+        showGuides: false,
         dots: [
             { id: '1', x: 300, y: 80, label: '1', isStart: true },
             { id: '2', x: 150, y: 320, label: '2' },
@@ -1353,6 +1477,8 @@ const shapeSquareIntro: TExercise = {
         type: 'dots',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_42,
+        showGuides: false,
         dots: [
             { id: '1', x: 175, y: 75, label: '1', isStart: true },
             { id: '2', x: 425, y: 75, label: '2' },
@@ -1384,6 +1510,8 @@ const shapeDiamondIntro: TExercise = {
         type: 'dots',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_43,
+        showGuides: false,
         dots: [
             { id: '1', x: 300, y: 50, label: '1', isStart: true },
             { id: '2', x: 450, y: 200, label: '2' },
@@ -1415,6 +1543,8 @@ const shapeRectangleIntro: TExercise = {
         type: 'dots',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_43,
+        showGuides: false,
         dots: [
             { id: '1', x: 100, y: 125, label: '1', isStart: true },
             { id: '2', x: 500, y: 125, label: '2' },
@@ -1446,6 +1576,8 @@ const shapeCircleIntro: TExercise = {
         type: 'dots',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_44,
+        showGuides: false,
         dots: [
             { id: '1', x: 300, y: 75, label: '1', isStart: true },
             { id: '2', x: 400, y: 105, label: '2' },
@@ -1483,6 +1615,8 @@ const shapeOvalIntro: TExercise = {
         type: 'dots',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_44,
+        showGuides: false,
         dots: [
             { id: '1', x: 300, y: 125, label: '1', isStart: true },
             { id: '2', x: 400, y: 150, label: '2' },
@@ -1525,6 +1659,9 @@ const shapeTrianglePractice: TExercise = {
         shapeType: 'triangle',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_45,
+        backgroundRotation: 90,
+        showGuides: false,
         targetBounds: { x: 150, y: 80, width: 300, height: 260 },
         expectedCorners: [
             { x: 300, y: 80 },
@@ -1555,6 +1692,9 @@ const shapeSquarePractice: TExercise = {
         shapeType: 'square',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_45,
+        backgroundRotation: 90,
+        showGuides: false,
         targetBounds: { x: 175, y: 75, width: 250, height: 250 },
         expectedCorners: [
             { x: 175, y: 75 },
@@ -1586,6 +1726,9 @@ const shapeDiamondPractice: TExercise = {
         shapeType: 'diamond',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_46,
+        backgroundRotation: 90,
+        showGuides: false,
         targetBounds: { x: 175, y: 50, width: 250, height: 300 },
         expectedCorners: [
             { x: 300, y: 50 },
@@ -1617,6 +1760,9 @@ const shapeRectanglePractice: TExercise = {
         shapeType: 'rectangle',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_46,
+        backgroundRotation: 90,
+        showGuides: false,
         targetBounds: { x: 100, y: 125, width: 400, height: 150 },
         expectedCorners: [
             { x: 100, y: 125 },
@@ -1648,6 +1794,9 @@ const shapeCirclePractice: TExercise = {
         shapeType: 'circle',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_47,
+        backgroundRotation: 90,
+        showGuides: false,
         targetBounds: { x: 175, y: 75, width: 250, height: 250 },
         center: { x: 300, y: 200 },
         radiusX: 125,
@@ -1676,6 +1825,9 @@ const shapeOvalPractice: TExercise = {
         shapeType: 'oval',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_47,
+        backgroundRotation: 90,
+        showGuides: false,
         targetBounds: { x: 125, y: 125, width: 350, height: 150 },
         center: { x: 300, y: 200 },
         radiusX: 175,
@@ -1708,6 +1860,9 @@ const colorWheelExercise: TExercise = {
         colorType: 'wheel',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_50,
+        backgroundRotation: 90,
+        showGuides: false,
         regions: [
             { id: 'red', name: 'Red', bounds: { x: 350, y: 50, width: 100, height: 100 }, targetColor: COLORS.red },
             { id: 'orange', name: 'Orange', bounds: { x: 400, y: 150, width: 100, height: 100 }, targetColor: COLORS.orange },
@@ -1739,6 +1894,9 @@ const colorRainbowExercise: TExercise = {
         colorType: 'fill',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_52,
+        backgroundRotation: 90,
+        showGuides: false,
         regions: [
             { id: 'red', name: 'Red', bounds: { x: 50, y: 50, width: 500, height: 50 }, targetColor: COLORS.red },
             { id: 'orange', name: 'Orange', bounds: { x: 50, y: 100, width: 500, height: 50 }, targetColor: COLORS.orange },
@@ -1774,6 +1932,9 @@ const colorAppleExercise: TExercise = {
         colorType: 'fill',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_53,
+        backgroundRotation: 90,
+        showGuides: false,
         regions: [
             {
                 id: 'apple',
@@ -1806,6 +1967,9 @@ const colorOrangeExercise: TExercise = {
         colorType: 'fill',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_53,
+        backgroundRotation: 90,
+        showGuides: false,
         regions: [
             {
                 id: 'orange',
@@ -1837,6 +2001,9 @@ const colorBananaExercise: TExercise = {
         colorType: 'fill',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_54,
+        backgroundRotation: 90,
+        showGuides: false,
         regions: [
             {
                 id: 'banana',
@@ -1868,6 +2035,9 @@ const colorPearExercise: TExercise = {
         colorType: 'fill',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_54,
+        backgroundRotation: 90,
+        showGuides: false,
         regions: [
             {
                 id: 'pear',
@@ -1899,6 +2069,9 @@ const colorBlueberriesExercise: TExercise = {
         colorType: 'fill',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_55,
+        backgroundRotation: 90,
+        showGuides: false,
         regions: [
             {
                 id: 'blueberries',
@@ -1930,6 +2103,9 @@ const colorGrapesExercise: TExercise = {
         colorType: 'fill',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_55,
+        backgroundRotation: 90,
+        showGuides: false,
         regions: [
             {
                 id: 'grapes',
@@ -1965,6 +2141,8 @@ const traceColorTree: TExercise = {
         colorType: 'fill',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_56,
+        showGuides: false,
         regions: [
             {
                 id: 'tree-top',
@@ -2002,6 +2180,8 @@ const traceColorIcecream: TExercise = {
         colorType: 'fill',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_57,
+        showGuides: false,
         regions: [
             {
                 id: 'scoop1',
@@ -2045,6 +2225,8 @@ const traceColorHouse: TExercise = {
         colorType: 'fill',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_58,
+        showGuides: false,
         regions: [
             {
                 id: 'roof',
@@ -2088,6 +2270,8 @@ const traceColorStar: TExercise = {
         colorType: 'fill',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_59,
+        showGuides: false,
         regions: [
             {
                 id: 'star',
@@ -2125,6 +2309,8 @@ const traceColorFlower: TExercise = {
         colorType: 'fill',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_60,
+        showGuides: false,
         regions: [
             {
                 id: 'petals',
@@ -2168,6 +2354,8 @@ const traceColorTruck: TExercise = {
         colorType: 'fill',
         canvasWidth: CANVAS_WIDTH,
         canvasHeight: CANVAS_HEIGHT,
+        backgroundImage: K_PAGE_61,
+        showGuides: false,
         regions: [
             {
                 id: 'cab',

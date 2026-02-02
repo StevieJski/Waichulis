@@ -100,7 +100,7 @@ export class LearnUi {
         if (this.progress.currentLessonId) {
             const lesson = getLessonById(this.progress.currentLessonId);
             if (lesson) {
-                this.viewState.selectedUnit = lesson.unit;
+                this.viewState.selectedUnit = lesson.unit === 'dot' ? 'line' : lesson.unit;
             }
         }
 
@@ -199,6 +199,28 @@ export class LearnUi {
         const list = BB.el({
             className: classes.lessonList,
         });
+
+        if (this.viewState.selectedUnit === 'line') {
+            const lineUnit = getUnitById('line', this.viewState.selectedGrade);
+            const dotUnit = getUnitById('dot', this.viewState.selectedGrade);
+            const lessons = [
+                ...(lineUnit?.lessons || []),
+                ...(dotUnit?.lessons || []),
+            ];
+            if (lessons.length === 0) {
+                list.append(
+                    BB.el({
+                        className: classes.emptyState,
+                        content: 'No lessons available.',
+                    })
+                );
+                return list;
+            }
+            for (const lesson of lessons) {
+                list.append(this.createLessonCard(lesson));
+            }
+            return list;
+        }
 
         const unit = getUnitById(this.viewState.selectedUnit, this.viewState.selectedGrade);
         if (!unit) {
