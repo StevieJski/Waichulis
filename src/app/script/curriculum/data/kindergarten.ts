@@ -1022,7 +1022,6 @@ const dotsFlower: TExercise = {
         backgroundImage: K_PAGE_29,
         showGuides: false,
         resultingShape: 'flower stem',
-        backgroundImage: 'flower-petals.svg',
     } as TDotsConfig,
     passingScore: 70,
     feedbackHints: {
