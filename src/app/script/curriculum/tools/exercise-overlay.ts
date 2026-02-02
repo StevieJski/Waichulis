@@ -58,7 +58,7 @@ export class ExerciseOverlay {
     private exercise: TExercise | null = null;
     private hitDots: Set<string> = new Set();
     private colors: TOverlayColors;
-    private renderBackground: boolean;
+    private renderBackgroundEnabled: boolean;
 
     constructor(
         width: number,
@@ -67,7 +67,7 @@ export class ExerciseOverlay {
         options?: { renderBackground?: boolean }
     ) {
         this.colors = { ...DEFAULT_COLORS, ...colors };
-        this.renderBackground = options?.renderBackground !== false;
+        this.renderBackgroundEnabled = options?.renderBackground !== false;
 
         // Create root SVG element
         this.svgEl = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -186,7 +186,7 @@ export class ExerciseOverlay {
     }
 
     private renderBackground(): void {
-        if (!this.renderBackground) return;
+        if (!this.renderBackgroundEnabled) return;
         if (!this.exercise) return;
         const config = this.exercise.config;
         if (!config.backgroundImage) return;
